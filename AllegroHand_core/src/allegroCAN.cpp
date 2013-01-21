@@ -72,7 +72,7 @@ void SetTorqueCallback(const sensor_msgs::JointState& msg)
 	for(int i=0;i<DOF_JOINTS;i++) control_torque[i] = msg.effort[i];
 	mutex->unlock();
 	
-	printf("Torque Received\n\n");
+	//printf("Torque Received\n\n");
 
 }
 
@@ -148,8 +148,8 @@ int main(int argc, char** argv)
 	mutex = new boost::mutex();
 
 	// Publister and Subscriber
-	current_jointState_pub	= nh.advertise<sensor_msgs::JointState>(JOINT_READ_ENCODER_TOPIC, 3);
-	control_torque_sub	 	= nh.subscribe(JOINT_WRITE_TORQUE_TOPIC, 3, SetTorqueCallback);
+	current_jointState_pub	= nh.advertise<sensor_msgs::JointState>(JOINT_READ_ENCODER_TOPIC, 1);
+	control_torque_sub	 	= nh.subscribe(JOINT_WRITE_TORQUE_TOPIC, 1, SetTorqueCallback);
 
 	// Create arrays 16 long for each of the four joint state components
 	msgJoint.position.resize(DOF_JOINTS);
