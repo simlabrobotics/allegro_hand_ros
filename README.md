@@ -6,8 +6,7 @@ ROS stack for SimLab's Allegro Hand
 This ROS Stack includes code and tools useful
 to users of SimLab Co., Ltd.'s Allegro Hand.
 
-=========================
-= Package Descriptions: =
+Package Descriptions:
 =========================
 
 *AllegroHand [deprecated]
