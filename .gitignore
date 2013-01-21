@@ -4,7 +4,8 @@
 *.o
 
 # Compiled Dynamic libraries
-*.dylib
+!*.so 		#override exclusion in ~/.gitignore_global
+*.dylib  
 
 # Compiled Static libraries
 *.lai
