@@ -1,0 +1,21 @@
+<launch>
+	<arg name="model" default="$(find AllegroHand_urdf)/AllegroHand_Left.urdf"/>
+	<arg name="gui" default="True" />
+	<param name="robot_description" textfile="$(arg model)" />
+	<param name="use_gui" value="$(arg gui)"/>
+	
+	
+	
+	<node name="AllegroHand" pkg="AllegroHand" type="AllegroHand" >
+		<remap from="/allegro/joint_cmd" to="joint_states"/>
+	</node>
+	
+	<!--
+	<node name="Keyboard" pkg="AllegroHand_keyboard" type="AllegroHand_keyboard" ></node>
+    -->
+    
+    <node name="Joint_GUI" pkg="joint_state_publisher_experimental" type="joint_state_publisher" ></node>
+	<node name="Allegro_TF" pkg="robot_state_publisher" type="state_publisher" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find AllegroHand_urdf)/urdf.vcg" />
+	
+</launch>

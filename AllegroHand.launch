@@ -1,0 +1,13 @@
+<launch>
+	<node name="AllegroHand" pkg="AllegroHand" type="AllegroHand" ></node>
+	
+	<node name="Keyboard" pkg="AllegroHand_keyboard" type="AllegroHand_keyboard" ></node>
+	
+	<param name="robot_description" textfile="$(find AllegroHand_urdf)/AllegroHand_Left.urdf"/>
+	<node name="Allegro_TF" pkg="robot_state_publisher" type="state_publisher">
+        <remap from="joint_states" to="/allegro/joint_states"/>
+    </node>
+    
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find AllegroHand_urdf)/urdf.vcg" />
+	
+</launch>

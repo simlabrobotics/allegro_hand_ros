@@ -1,0 +1,65 @@
+digraph G {
+node [shape=box];
+"base_link" [label="base_link"];
+"link_0.0" [label="link_0.0"];
+"link_1.0" [label="link_1.0"];
+"link_2.0" [label="link_2.0"];
+"link_3.0" [label="link_3.0"];
+"link_3.0_tip" [label="link_3.0_tip"];
+"link_12.0" [label="link_12.0"];
+"link_13.0" [label="link_13.0"];
+"link_14.0" [label="link_14.0"];
+"link_15.0" [label="link_15.0"];
+"link_15.0_tip" [label="link_15.0_tip"];
+"link_4.0" [label="link_4.0"];
+"link_5.0" [label="link_5.0"];
+"link_6.0" [label="link_6.0"];
+"link_7.0" [label="link_7.0"];
+"link_7.0_tip" [label="link_7.0_tip"];
+"link_8.0" [label="link_8.0"];
+"link_9.0" [label="link_9.0"];
+"link_10.0" [label="link_10.0"];
+"link_11.0" [label="link_11.0"];
+"link_11.0_tip" [label="link_11.0_tip"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_link" -> "joint_0.0" [label="xyz: 0 -0.044981 -0.002298 \nrpy: 0.0872665 -0 0"]
+"joint_0.0" -> "link_0.0"
+"link_0.0" -> "joint_1.0" [label="xyz: 0 0 0.0164 \nrpy: 0 -0 0"]
+"joint_1.0" -> "link_1.0"
+"link_1.0" -> "joint_2.0" [label="xyz: 0 0 0.054 \nrpy: 0 -0 0"]
+"joint_2.0" -> "link_2.0"
+"link_2.0" -> "joint_3.0" [label="xyz: 0 0 0.0384 \nrpy: 0 -0 0"]
+"joint_3.0" -> "link_3.0"
+"link_3.0" -> "joint_3.0_tip" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint_3.0_tip" -> "link_3.0_tip"
+"base_link" -> "joint_12.0" [label="xyz: -0.0182 -0.0168753 -0.07308 \nrpy: -3.14159 -1.48353 -1.5708"]
+"joint_12.0" -> "link_12.0"
+"link_12.0" -> "joint_13.0" [label="xyz: 0 0 0.0375 \nrpy: 0 -0 0"]
+"joint_13.0" -> "link_13.0"
+"link_13.0" -> "joint_14.0" [label="xyz: 0 0 0.0177 \nrpy: 0 -0 0"]
+"joint_14.0" -> "link_14.0"
+"link_14.0" -> "joint_15.0" [label="xyz: 0 0 0.0514 \nrpy: 0 -0 0"]
+"joint_15.0" -> "link_15.0"
+"link_15.0" -> "joint_15.0_tip" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint_15.0_tip" -> "link_15.0_tip"
+"base_link" -> "joint_4.0" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint_4.0" -> "link_4.0"
+"link_4.0" -> "joint_5.0" [label="xyz: 0 0 0.0164 \nrpy: 0 -0 0"]
+"joint_5.0" -> "link_5.0"
+"link_5.0" -> "joint_6.0" [label="xyz: 0 0 0.054 \nrpy: 0 -0 0"]
+"joint_6.0" -> "link_6.0"
+"link_6.0" -> "joint_7.0" [label="xyz: 0 0 0.0384 \nrpy: 0 -0 0"]
+"joint_7.0" -> "link_7.0"
+"link_7.0" -> "joint_7.0_tip" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint_7.0_tip" -> "link_7.0_tip"
+"base_link" -> "joint_8.0" [label="xyz: 0 0.044981 -0.002298 \nrpy: -0.0872665 0 0"]
+"joint_8.0" -> "link_8.0"
+"link_8.0" -> "joint_9.0" [label="xyz: 0 0 0.0164 \nrpy: 0 -0 0"]
+"joint_9.0" -> "link_9.0"
+"link_9.0" -> "joint_10.0" [label="xyz: 0 0 0.054 \nrpy: 0 -0 0"]
+"joint_10.0" -> "link_10.0"
+"link_10.0" -> "joint_11.0" [label="xyz: 0 0 0.0384 \nrpy: 0 -0 0"]
+"joint_11.0" -> "link_11.0"
+"link_11.0" -> "joint_11.0_tip" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint_11.0_tip" -> "link_11.0_tip"
+}

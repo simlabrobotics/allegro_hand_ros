@@ -17,3 +17,13 @@
 
 # built stuff
 *build/
+
+# documentation (maybe uncomment this later)
+*html/
+*latex/
+*.dox
+*.html
+
+# SVN
+*.svn/
+
