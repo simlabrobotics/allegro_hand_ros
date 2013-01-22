@@ -264,7 +264,7 @@ void controlAllegroHand::_readDevices()
 					curr_position[i+4*(lID-ID_DEVICE_SUB_01)] = q[i];
 				}
 				itr++;
-				printf("%d, ", lID );
+				//printf("%d, ", lID );
 			}
 			else if( lID == 0)
 			{
@@ -281,14 +281,14 @@ void controlAllegroHand::_readDevices()
 
 	if( itr < 4)
 	{
-		printf(": %d  \n", itr );
+		//printf(": %d  \n", itr );
 		errorcnt++;
 		if( errorcnt > 3 ){
 			mEmergencyStop = true;
 		}
 	}
 	else{
-		printf(": %d  \n", itr );
+		//printf(": %d  \n", itr );
 		errorcnt = 0;
 	}
 

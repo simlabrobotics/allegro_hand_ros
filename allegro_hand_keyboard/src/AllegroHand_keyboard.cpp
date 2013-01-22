@@ -128,7 +128,7 @@ edit_(0.0)
 //  nh_.param("scale_angular", a_scale_, a_scale_);
 //  nh_.param("scale_linear", l_scale_, l_scale_);
 
-  cmd_pub_ = nh_.advertise<std_msgs::String>("allegrohand/lib_cmd", 10);
+  cmd_pub_ = nh_.advertise<std_msgs::String>("allegroHand/lib_cmd", 10);
 }
 
 
@@ -161,12 +161,12 @@ void quit(int sig)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "allegrohand_keyboard_cmd");
-  AHKeyboard allegrohand_keyboard_cmd;
+  ros::init(argc, argv, "allegro_hand_keyboard_cmd");
+  AHKeyboard allegro_hand_keyboard_cmd;
 
   signal(SIGINT,quit);
 
-  allegrohand_keyboard_cmd.keyLoop();
+  allegro_hand_keyboard_cmd.keyLoop();
   
   return(0);
 }
