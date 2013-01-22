@@ -71,6 +71,7 @@ void SetTorqueCallback(const sensor_msgs::JointState& msg)
 	mutex->lock();
 	for(int i=0;i<DOF_JOINTS;i++) control_torque[i] = msg.effort[i];
 	mutex->unlock();
+	canDevice->setTorque(control_torque);
 	
 	//printf("Torque Received\n\n");
 
@@ -93,7 +94,8 @@ void timerCallback(const ros::TimerEvent& event)
 	for(int i=0; i<DOF_JOINTS; i++)		previous_position[i] = current_position[i];
 
 	// CAN Communication
-	canDevice->setTorque(control_torque);
+	
+	//canDevice->setTorque(control_torque);
 	lEmergencyStop = canDevice->update();
 	canDevice->getJointInfo(current_position);
 
