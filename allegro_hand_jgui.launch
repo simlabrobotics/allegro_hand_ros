@@ -6,8 +6,8 @@
 	
 	
 	
-	<node name="allegro_hand" pkg="allegro_hand" type="allegro_hand" >
-		<remap from="/allegro/joint_cmd" to="joint_states"/>
+	<node name="allegro_hand" pkg="allegro_hand_core_grasp" type="allegro_hand_core_grasp" >
+		<remap from="/allegroHand/joint_cmd" to="joint_states"/>
 	</node>
 	
 	<!--
