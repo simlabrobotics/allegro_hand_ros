@@ -4,7 +4,7 @@
 *.o
 
 # Compiled Dynamic libraries
-!*.so 		#override exclusion in ~/.gitignore_global
+#!*.so 		#override exclusion in ~/.gitignore_global
 *.dylib  
 
 # Compiled Static libraries
@@ -17,6 +17,10 @@
 
 # built stuff
 *build/
+
+# closed-source
+*BHand/
+*BHand/*
 
 # documentation (maybe uncomment this later)
 *html/
