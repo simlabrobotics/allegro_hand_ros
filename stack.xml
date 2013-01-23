@@ -4,9 +4,8 @@
   </description>
   <author>Alex Alspach, Seungsu Kim</author>
   <license>BSD</license>  
-  <review status="unreviewed" notes=""/>
+  <review status="unreviewed" notes="experimental / possibly unstable"/>
   <url>http://ros.org/wiki/AllegroHandStack</url>
-  <depend stack="libpcan" />
   <depend stack="ros" />
   <depend stack="ros_comm" />
 

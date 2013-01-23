@@ -1,0 +1,14 @@
+<package>
+  <description brief="URDF Python">
+    Test package for URDF Python libraries
+  </description>
+  <author>David V. Lu!!, Kelsey Hawkins, Thomas Moulard</author>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/urdf_python</url>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+  <depend package="tf"/>
+
+</package>
+
+
