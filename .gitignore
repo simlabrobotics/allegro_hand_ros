@@ -19,8 +19,7 @@
 *build/
 
 # closed-source
-*BHand/
-*BHand/*
+*underDevelopment/
 
 # documentation (maybe uncomment this later)
 *html/

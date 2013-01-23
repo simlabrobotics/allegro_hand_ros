@@ -264,7 +264,11 @@ void controlAllegroHand::_readDevices()
 					curr_position[i+4*(lID-ID_DEVICE_SUB_01)] = q[i];
 				}
 				itr++;
+<<<<<<< HEAD
 				printf("%d, ", lID );
+=======
+				//printf("%d, ", lID );
+>>>>>>> f52340901b8ee1d7e1cd864848f79032fccea222
 			}
 			else if( lID == 0)
 			{
@@ -281,14 +285,22 @@ void controlAllegroHand::_readDevices()
 
 	if( itr < 4)
 	{
+<<<<<<< HEAD
 		printf(": %d  \n", itr );
+=======
+		//printf(": %d  \n", itr );
+>>>>>>> f52340901b8ee1d7e1cd864848f79032fccea222
 		errorcnt++;
 		if( errorcnt > 3 ){
 			mEmergencyStop = true;
 		}
 	}
 	else{
+<<<<<<< HEAD
 		printf(": %d  \n", itr );
+=======
+		//printf(": %d  \n", itr );
+>>>>>>> f52340901b8ee1d7e1cd864848f79032fccea222
 		errorcnt = 0;
 	}
 
