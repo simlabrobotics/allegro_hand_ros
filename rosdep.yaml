@@ -1,0 +1,14 @@
+linux-headers-generic:
+  ubuntu: linux-headers-generic
+
+libusb-dev: 
+  ubuntu: libusb-dev
+
+unzip: 
+  ubuntu: unzip
+
+cvs:
+  ubuntu: cvs
+
+libpopt-dev:
+  ubuntu: libpopt-dev

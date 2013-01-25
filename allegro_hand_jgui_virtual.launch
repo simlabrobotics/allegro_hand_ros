@@ -5,12 +5,12 @@
 	<param name="use_gui" value="$(arg gui)"/>
 	
 	
-	
+	<!--
 	<node name="allegro_hand" pkg="allegro_hand_core_grasp" type="allegro_hand_core_grasp" >
 		<remap from="/allegroHand/joint_cmd" to="joint_states"/>
 	</node>
 	
-	<!--
+	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" ></node>
     -->
     
