@@ -19,8 +19,9 @@
 *build/
 
 # closed-source
-*underDevelopment/
-*old/
+#*underDevelopment/
+#*old/
+*closed_source/
 
 # documentation (maybe uncomment this later)
 *html/
