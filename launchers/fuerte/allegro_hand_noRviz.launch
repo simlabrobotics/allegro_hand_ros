@@ -8,6 +8,5 @@
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
     
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_urdf)/urdf.vcg" />
 	
 </launch>

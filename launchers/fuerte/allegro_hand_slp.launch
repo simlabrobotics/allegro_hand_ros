@@ -1,5 +1,5 @@
 <launch>
-	<node name="allegro_hand" pkg="allegro_hand_core_grasp" type="allegro_hand_core_grasp" ></node>
+	<node name="allegro_hand" pkg="allegro_hand_core_grasp_slp" type="allegro_hand_core_grasp_slp" ></node>
 	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" ></node>
 	
@@ -8,6 +8,6 @@
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
     
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_urdf)/urdf.vcg" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_urdf)/allegro_hand_config.vcg" />
 	
 </launch>
