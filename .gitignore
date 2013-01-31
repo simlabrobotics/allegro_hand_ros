@@ -19,7 +19,7 @@
 *build/
 
 # closed-source
-*underDev*/
+*underDev/
 *old/
 *closed_source/
 
