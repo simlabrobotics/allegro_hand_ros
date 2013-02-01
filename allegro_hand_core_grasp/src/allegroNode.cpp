@@ -61,10 +61,7 @@ double dt;
 
 // Initialize BHand 
 eMotionType gMotionType = eMotionType_NONE ;
-// Uncomment one of the following according to which hand you are using
-// Need to make this an option externally w/o recompiling
-  BHand lBHand(eHandType_Left);
-//BHand lBHand(eHandType_Right);
+BHand lBHand(eHandType_Right);
 
 
 // Initialize CAN device		
@@ -163,7 +160,8 @@ void timerCallback(const ros::TimerEvent& event)
 	if( lEmergencyStop < 0 )
 	{
 		// Stop program when Allegro Hand is switched off
-		printf("\n\n\nEMERGENCY STOP.\n\n");
+		//printf("\n\n\nEMERGENCY STOP.\n\n");
+		ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
 		ros::shutdown();
 	}
 
@@ -227,7 +225,8 @@ void timerCallback(const ros::TimerEvent& event)
 
 int main(int argc, char** argv)
 {
-
+	using namespace std;
+	
 	ros::init(argc, argv, "allegro_hand_core_grasp");
 	ros::Time::init();
 	
@@ -267,7 +266,24 @@ int main(int argc, char** argv)
 	msgJoint.name[14] = "joint_14.0";
 	msgJoint.name[15] = "joint_15.0";
 
+	
+	// Dump Allegro Hand information to the terminal
+	string robot_name, whichHand, manufacturer, origin, serial, version;
+	ros::param::get("/hand_info/robot_name",robot_name);
+	ros::param::get("/hand_info/which_hand",whichHand);
+	ros::param::get("/hand_info/manufacturer",manufacturer);
+	ros::param::get("/hand_info/origin",origin);
+	ros::param::get("/hand_info/serial",serial);
+	ros::param::get("/hand_info/version",version);
+	cout << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl  << endl;
+	
 	// Initialize BHand controller
+	if (whichHand.compare("left") == 0)
+	{
+		BHand lBHand(eHandType_Left);
+	}
+	
+	
 	lBHand.SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	// Initialize CAN device
@@ -290,7 +306,8 @@ int main(int argc, char** argv)
 	// Clean shutdown: shutdown node, shutdown can, be polite.
 	nh.shutdown();
 	delete canDevice;
-	printf("\nBye.\n");
+	//printf("\nBye.\n");
+	printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
 	return 0;
 }
 
