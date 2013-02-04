@@ -25,13 +25,18 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-link_directories(${PROJECT_SOURCE_DIR}/lib)
-rosbuild_add_executable(${PROJECT_NAME} src/allegroNode.cpp src/controlAllegroHand.cpp)
+link_directories(${PROJECT_SOURCE_DIR}/../allegro_hand_common/lib)
+rosbuild_add_executable(${PROJECT_NAME} src/allegroNode.cpp ../allegro_hand_common/src/controlAllegroHand.cpp)
+
+include_directories(../allegro_hand_common/include)
 target_link_libraries(${PROJECT_NAME} BHand pcan)
+
 rosbuild_link_boost(${PROJECT_NAME} thread)
+
 

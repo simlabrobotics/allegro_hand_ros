@@ -31,7 +31,6 @@
 double current_position[DOF_JOINTS];
 double previous_position[DOF_JOINTS];
 double current_velocity[DOF_JOINTS];
-double current_torque[DOF_JOINTS];
 double desired_position[DOF_JOINTS];
 double desired_torque[DOF_JOINTS];
 std::string  lib_cmd;
@@ -220,7 +219,7 @@ int main(int argc, char** argv)
 		//// CAN Communication
 		canDevice->setTorque(desired_torque);
 		lEmergencyStop = canDevice->update();
-		canDevice->getJointInfo(current_position, current_torque);
+                canDevice->getJointInfo(current_position);
 		//// end CAN Communication
 
 		if( lEmergencyStop < 0 )
