@@ -29,22 +29,38 @@
 #include "std_msgs/String.h"
 
 #include <stdio.h>
+#include <math.h>
 #include <iostream>
 #include <string>
 
-//#include "BHand/BHand.h"
 #include "controlAllegroHand.h"
+
+#define RADIANS_TO_DEGREES(radians) ((radians) * (180.0 / M_PI))
+#define DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
+
 
 // Topics
 #define JOINT_STATE_TOPIC "/allegroHand/joint_states"
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define EXT_CMD_TOPIC "/allegroHand/external_cmd"
 
-double current_position[DOF_JOINTS]	= {0};
-double previous_position[DOF_JOINTS]= {0};
-double current_velocity[DOF_JOINTS]	= {0};
-double desired_position[DOF_JOINTS]	= {0};
-double desired_torque[DOF_JOINTS]	= {0};
+double current_position[DOF_JOINTS] 			= {0.0};
+double previous_position[DOF_JOINTS]			= {0.0};
+
+double current_position_filtered[DOF_JOINTS] 	= {0.0};
+double previous_position_filtered[DOF_JOINTS]	= {0.0};
+
+double current_velocity[DOF_JOINTS] 			= {0.0};
+double previous_velocity[DOF_JOINTS] 			= {0.0};
+double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
+
+double desired_position[DOF_JOINTS]				= {0.0};
+double desired_torque[DOF_JOINTS] 				= {0.0};
+
+double k_p[DOF_JOINTS];
+double k_d[DOF_JOINTS];
+
+
 
 int frame = 0;
 
@@ -68,6 +84,10 @@ double dt;
 
 // Initialize CAN device		
 controlAllegroHand *canDevice;
+
+
+
+
 
 
 
@@ -97,6 +117,10 @@ void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 }
 
 
+
+
+
+
 // In case of the Allegro Hand, this callback is processed
 // every 0.003 seconds
 void timerCallback(const ros::TimerEvent& event)
@@ -105,11 +129,17 @@ void timerCallback(const ros::TimerEvent& event)
 	tnow = ros::Time::now();
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
+	
+/*  ================================= 
+    =          UPDATE GAINS         = 
+    ================================= */	
+	// Read the gains.yaml file every iteration
+	// This will allow us to update gains on the fly for tuning!
 		
-	// save last joint position for velocity calc
+	// save last iteration info
 	for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
-		
-		
+	for(int i=0; i<DOF_JOINTS; i++) previous_position_filtered[i] = current_position_filtered[i];
+	for(int i=0; i<DOF_JOINTS; i++) previous_velocity[i] = current_velocity[i];
 		
 		
 /*  ================================= 
@@ -132,9 +162,33 @@ void timerCallback(const ros::TimerEvent& event)
 
 
 /*  ================================= 
-    =  COMPUTE CONTROL TORQUE HERE  =   
-    ================================= */	
+    =       LOWPASS FILTERING       =   
+    ================================= */
+    //double alpha = 0.6;
+    //double beta = 0.198;	
+	for(int i=0; i<DOF_JOINTS; i++)    
+	{
+    	current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
+		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
+	}
+	
+/*  ================================= 
+    =        POSITION CONTROL       =   
+    ================================= */
+    if(frame>20) // give the low pass filters 20 iterations to build up good data.
+    {	
+		for(int i=0; i<DOF_JOINTS; i++)    
+		{
+			desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
+			desired_torque[i] = desired_torque[i]/800.0;
+		}
+	}		
 
+
+/*  ================================= 
+    =   ADD VELOCITY SAT. CONTRL    =   
+    ================================= */
 
 		
 	// PUBLISH current position, velocity and effort (torque)
@@ -142,7 +196,7 @@ void timerCallback(const ros::TimerEvent& event)
 	
 	for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
 	
-	for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
+	//for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
 	for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
 	
 	for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
@@ -163,6 +217,62 @@ void timerCallback(const ros::TimerEvent& event)
 
 int main(int argc, char** argv)
 {
+
+k_p[0]  = 600;
+k_p[1]  = 600;
+k_p[2]  = 600;
+k_p[3]  = 1000;
+k_p[4]  = 600;
+k_p[5]  = 600;
+k_p[6]  = 600;
+k_p[7]  = 1000;
+k_p[8]  = 600;
+k_p[9]  = 600;
+k_p[10] = 600;
+k_p[11] = 1000;
+k_p[12] = 1000;
+k_p[13] = 1000;
+k_p[14] = 1000;
+k_p[15] = 600;
+
+k_d[0]  = 15;
+k_d[1]  = 20;
+k_d[2]  = 15;
+k_d[3]  = 15;
+k_d[4]  = 15;
+k_d[5]  = 20;
+k_d[6]  = 15;
+k_d[7]  = 15;
+k_d[8]  = 15;
+k_d[9]  = 20;
+k_d[10] = 15;
+k_d[11] = 15;
+k_d[12] = 30;
+k_d[13] = 20;
+k_d[14] = 20;
+k_d[15] = 15;
+
+desired_position[0]  = DEGREES_TO_RADIANS(0.0);
+desired_position[1]  = DEGREES_TO_RADIANS(-10.0);
+desired_position[2]  = DEGREES_TO_RADIANS(45.0);
+desired_position[3]  = DEGREES_TO_RADIANS(45.0);
+desired_position[4]  = DEGREES_TO_RADIANS(0.0);
+desired_position[5]  = DEGREES_TO_RADIANS(-10.0);
+desired_position[6]  = DEGREES_TO_RADIANS(45.0);
+desired_position[7]  = DEGREES_TO_RADIANS(45.0);
+desired_position[8]  = DEGREES_TO_RADIANS(5.0);
+desired_position[9]  = DEGREES_TO_RADIANS(-5.0);
+desired_position[10] = DEGREES_TO_RADIANS(50.0);
+desired_position[11] = DEGREES_TO_RADIANS(45.0);
+desired_position[12] = DEGREES_TO_RADIANS(60.0);
+desired_position[13] = DEGREES_TO_RADIANS(25.0);
+desired_position[14] = DEGREES_TO_RADIANS(15.0);
+desired_position[15] = DEGREES_TO_RADIANS(45.0);
+
+
+
+
+
 	using namespace std;
 	
 	ros::init(argc, argv, "allegro_hand_core");
@@ -214,7 +324,7 @@ int main(int argc, char** argv)
 	ros::param::get("/hand_info/origin",origin);
 	ros::param::get("/hand_info/serial",serial);
 	ros::param::get("/hand_info/version",version);
-	
+
 
 	// Initialize CAN device
 	canDevice = new controlAllegroHand();
@@ -223,9 +333,6 @@ int main(int argc, char** argv)
 	
 	// Dump Allegro Hand information to the terminal	
 	cout << endl << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
-
-	// Initialize torque at zero
-	//for(int i=0; i<16; i++) desired_torque[i] = 0.0;
 
 	// Start ROS time
 	tstart = ros::Time::now();

@@ -1,0 +1,10 @@
+<launch>
+
+
+
+	<node name="allegro_hand" pkg="allegro_hand_core_pd" type="allegro_hand_core_pd" output="screen"></node>
+	
+	<rosparam file="parameters/zero.yaml" command="load" />
+	 	
+	
+</launch>

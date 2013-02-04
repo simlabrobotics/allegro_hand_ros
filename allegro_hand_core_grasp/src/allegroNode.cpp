@@ -265,7 +265,8 @@ int main(int argc, char** argv)
 	msgJoint.name[15] = "joint_15.0";
 
 	
-	// Dump Allegro Hand information to the terminal
+	// Get Allegro Hand information from parameter server
+	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
 	string robot_name, whichHand, manufacturer, origin, serial, version;
 	ros::param::get("/hand_info/robot_name",robot_name);
 	ros::param::get("/hand_info/which_hand",whichHand);
@@ -273,8 +274,7 @@ int main(int argc, char** argv)
 	ros::param::get("/hand_info/origin",origin);
 	ros::param::get("/hand_info/serial",serial);
 	ros::param::get("/hand_info/version",version);
-	cout << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl  << endl;
-	
+
 	// Initialize BHand controller
 	if (whichHand.compare("left") == 0)
 	{
@@ -291,6 +291,10 @@ int main(int argc, char** argv)
 	canDevice = new controlAllegroHand();
 	canDevice->init();
 	usleep(3000);
+	
+	// Dump Allegro Hand information to the terminal	
+	cout << endl << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	
 
 	// Initialize torque at zero
 	for(int i=0; i<16; i++) desired_torque[i] = 0.0;
