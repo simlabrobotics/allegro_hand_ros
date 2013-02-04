@@ -31,7 +31,6 @@
 double current_position[DOF_JOINTS];
 double previous_position[DOF_JOINTS];
 double current_velocity[DOF_JOINTS];
-double current_torque[DOF_JOINTS];
 double desired_position[DOF_JOINTS];
 double desired_torque[DOF_JOINTS];
 std::string  lib_cmd;
@@ -41,7 +40,6 @@ int frame = 0;
 
 // Flags
 bool lIsBegin = false;
-bool kill = false;	
 bool pdControl = true;
 int lEmergencyStop = 0;
 
@@ -84,46 +82,46 @@ void SetjointCallback(const sensor_msgs::JointState& msg)
 
 void libCmdCallback(const std_msgs::String::ConstPtr& msg)
 {
-ROS_INFO("I heard: [%s]", msg->data.c_str());
-lib_cmd = msg->data.c_str();
+	ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
+	lib_cmd = msg->data.c_str();
 
-// If PD Control is commanded, pdControl is set true
-// so that the controll loop has access to desired position.
-if (lib_cmd.compare("pdControl") == 0)
-{
-	lBHand.SetMotionType(eMotionType_JOINT_PD);
-	pdControl = true;
-}    
-else
-    pdControl = false;  
+	// If PD Control is commanded, pdControl is set true
+	// so that the controll loop has access to desired position.
+	if (lib_cmd.compare("pdControl") == 0)
+	{
+		lBHand.SetMotionType(eMotionType_JOINT_PD);
+		pdControl = true;
+	}    
+	else
+    	pdControl = false;  
 	
-if (lib_cmd.compare("home") == 0) 
-	lBHand.SetMotionType(eMotionType_HOME);
+	if (lib_cmd.compare("home") == 0) 
+		lBHand.SetMotionType(eMotionType_HOME);
     
-if (lib_cmd.compare("ready") == 0) 
-	lBHand.SetMotionType(eMotionType_READY);
+	if (lib_cmd.compare("ready") == 0) 
+		lBHand.SetMotionType(eMotionType_READY);
 	
-if (lib_cmd.compare("grasp_3") == 0) 
-	lBHand.SetMotionType(eMotionType_GRASP_3);
+	if (lib_cmd.compare("grasp_3") == 0) 
+		lBHand.SetMotionType(eMotionType_GRASP_3);
 	
-if (lib_cmd.compare("grasp_4") == 0) 
-	lBHand.SetMotionType(eMotionType_GRASP_4);
+	if (lib_cmd.compare("grasp_4") == 0) 
+		lBHand.SetMotionType(eMotionType_GRASP_4);
     
-if (lib_cmd.compare("pinch_it") == 0) 
-	lBHand.SetMotionType(eMotionType_PINCH_IT);
+	if (lib_cmd.compare("pinch_it") == 0) 
+		lBHand.SetMotionType(eMotionType_PINCH_IT);
 	
-if (lib_cmd.compare("pinch_mt") == 0) 
-	lBHand.SetMotionType(eMotionType_PINCH_MT); 	 
+	if (lib_cmd.compare("pinch_mt") == 0) 
+		lBHand.SetMotionType(eMotionType_PINCH_MT); 	 
 	
-if (lib_cmd.compare("envelop") == 0) 
-	lBHand.SetMotionType(eMotionType_ENVELOP); 
+	if (lib_cmd.compare("envelop") == 0) 
+		lBHand.SetMotionType(eMotionType_ENVELOP); 
 	
-if (lib_cmd.compare("off") == 0) 
-	lBHand.SetMotionType(eMotionType_NONE);
+	if (lib_cmd.compare("off") == 0) 
+		lBHand.SetMotionType(eMotionType_NONE);
 	
-if (lib_cmd.compare("save") == 0) 
-	for(int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];
-	
+	if (lib_cmd.compare("save") == 0) 
+		for(int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];
+		
 /*
 eMotionType_NONE,				// motor power off
 eMotionType_HOME,				// go to home position
@@ -154,7 +152,7 @@ void timerCallback(const ros::TimerEvent& event)
 	//// CAN Communication
 	canDevice->setTorque(desired_torque);
 	lEmergencyStop = canDevice->update();
-	canDevice->getJointInfo(current_position, current_torque);
+	canDevice->getJointInfo(current_position);
 	//// end CAN Communication
 				
 	if( lEmergencyStop < 0 )
@@ -281,9 +279,12 @@ int main(int argc, char** argv)
 	if (whichHand.compare("left") == 0)
 	{
 		BHand lBHand(eHandType_Left);
+		ROS_INFO("CTRL: Left Allegro Hand controller initialized.");
 	}
-	
-	
+	else
+	{
+		ROS_INFO("CTRL: Right Allegro Hand controller initialized.");
+	}
 	lBHand.SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	// Initialize CAN device

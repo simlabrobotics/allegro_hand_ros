@@ -10,6 +10,8 @@
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
+#include "ros/ros.h"
+
 using namespace std;
 
 void PRINT_INFO(const char *msg)
@@ -19,7 +21,17 @@ void PRINT_INFO(const char *msg)
 
 controlAllegroHand::controlAllegroHand()
 {
-	mEmergencyStop = false;
+
+	if (ros::param::has("zero"))
+	{
+		mEmergencyStop = false;		
+	}
+	else
+	{
+		ROS_ERROR("Encoder/Motor offsets and directions not loaded.\nCheck launch file is loading /parameters/zero.yaml\nShutting down...");
+		mEmergencyStop = true;
+	}
+
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
 	mPWM_MAX[eJOINTNAME_INDEX_1] = PWM_LIMIT_NEAR;
@@ -41,69 +53,71 @@ controlAllegroHand::controlAllegroHand()
 	mPWM_MAX[eJOINTNAME_THUMB_2] = PWM_LIMIT_THUMB_MIDDLE;
 	mPWM_MAX[eJOINTNAME_THUMB_3] = PWM_LIMIT_THUMB_FAR;
 
-
-	mEncoderOffset[eJOINTNAME_INDEX_0]  =     46;
-	mEncoderOffset[eJOINTNAME_INDEX_1]  = -66029;
-	mEncoderOffset[eJOINTNAME_INDEX_2]  =    128;
-	mEncoderOffset[eJOINTNAME_INDEX_3]  =     26;
-	mEncoderOffset[eJOINTNAME_MIDDLE_0] =   1446;
-	mEncoderOffset[eJOINTNAME_MIDDLE_1] = -64939;
-	mEncoderOffset[eJOINTNAME_MIDDLE_2] =   -802;
-	mEncoderOffset[eJOINTNAME_MIDDLE_3] =    686;
-	mEncoderOffset[eJOINTNAME_PINKY_0]  =  -1031;
-	mEncoderOffset[eJOINTNAME_PINKY_1]  = -66360;
-	mEncoderOffset[eJOINTNAME_PINKY_2]  =    612;
-	mEncoderOffset[eJOINTNAME_PINKY_3]  =    238;
-	mEncoderOffset[eJOINTNAME_THUMB_0]  = -65461;
-	mEncoderOffset[eJOINTNAME_THUMB_1]  = -65124;
-	mEncoderOffset[eJOINTNAME_THUMB_2]  =    258;
-	mEncoderOffset[eJOINTNAME_THUMB_3]  =    121;
-
-	mEncoderDirection[eJOINTNAME_INDEX_0]  =  1;
-	mEncoderDirection[eJOINTNAME_INDEX_1]  = -1;
-	mEncoderDirection[eJOINTNAME_INDEX_2]  =  1;
-	mEncoderDirection[eJOINTNAME_INDEX_3]  =  1;
-	mEncoderDirection[eJOINTNAME_MIDDLE_0] =  1;
-	mEncoderDirection[eJOINTNAME_MIDDLE_1] = -1;
-	mEncoderDirection[eJOINTNAME_MIDDLE_2] =  1;
-	mEncoderDirection[eJOINTNAME_MIDDLE_3] =  1;
-	mEncoderDirection[eJOINTNAME_PINKY_0]  =  1;
-	mEncoderDirection[eJOINTNAME_PINKY_1]  = -1;
-	mEncoderDirection[eJOINTNAME_PINKY_2]  =  1;
-	mEncoderDirection[eJOINTNAME_PINKY_3]  =  1;
-	mEncoderDirection[eJOINTNAME_THUMB_0]  = -1;
-	mEncoderDirection[eJOINTNAME_THUMB_1]  = -1;
-	mEncoderDirection[eJOINTNAME_THUMB_2]  =  1;
-	mEncoderDirection[eJOINTNAME_THUMB_3]  =  1;
-
-	mMotorDirection[eJOINTNAME_INDEX_0]  =  1;
-	mMotorDirection[eJOINTNAME_INDEX_1]  = -1;
-	mMotorDirection[eJOINTNAME_INDEX_2]  =  1;
-	mMotorDirection[eJOINTNAME_INDEX_3]  =  1;
-	mMotorDirection[eJOINTNAME_MIDDLE_0] =  1;
-	mMotorDirection[eJOINTNAME_MIDDLE_1] = -1;
-	mMotorDirection[eJOINTNAME_MIDDLE_2] =  1;
-	mMotorDirection[eJOINTNAME_MIDDLE_3] =  1;
-	mMotorDirection[eJOINTNAME_PINKY_0]  =  1;
-	mMotorDirection[eJOINTNAME_PINKY_1]  = -1;
-	mMotorDirection[eJOINTNAME_PINKY_2]  =  1;
-	mMotorDirection[eJOINTNAME_PINKY_3]  =  1;
-	mMotorDirection[eJOINTNAME_THUMB_0]  = -1;
-	mMotorDirection[eJOINTNAME_THUMB_1]  = -1;
-	mMotorDirection[eJOINTNAME_THUMB_2]  =  1;
-	mMotorDirection[eJOINTNAME_THUMB_3]  =  1;
+	ros::param::get("/zero/encoder_offset/j00",mEncoderOffset[eJOINTNAME_INDEX_0]);
+	ros::param::get("/zero/encoder_offset/j01",mEncoderOffset[eJOINTNAME_INDEX_1]);
+	ros::param::get("/zero/encoder_offset/j02",mEncoderOffset[eJOINTNAME_INDEX_2]);
+	ros::param::get("/zero/encoder_offset/j03",mEncoderOffset[eJOINTNAME_INDEX_3]);
+	ros::param::get("/zero/encoder_offset/j10",mEncoderOffset[eJOINTNAME_MIDDLE_0]);
+	ros::param::get("/zero/encoder_offset/j11",mEncoderOffset[eJOINTNAME_MIDDLE_1]);
+	ros::param::get("/zero/encoder_offset/j12",mEncoderOffset[eJOINTNAME_MIDDLE_2]);
+	ros::param::get("/zero/encoder_offset/j13",mEncoderOffset[eJOINTNAME_MIDDLE_3]);
+	ros::param::get("/zero/encoder_offset/j20",mEncoderOffset[eJOINTNAME_PINKY_0]);
+	ros::param::get("/zero/encoder_offset/j21",mEncoderOffset[eJOINTNAME_PINKY_1]);
+	ros::param::get("/zero/encoder_offset/j22",mEncoderOffset[eJOINTNAME_PINKY_2]);
+	ros::param::get("/zero/encoder_offset/j23",mEncoderOffset[eJOINTNAME_PINKY_3]);
+	ros::param::get("/zero/encoder_offset/j30",mEncoderOffset[eJOINTNAME_THUMB_0]);
+	ros::param::get("/zero/encoder_offset/j31",mEncoderOffset[eJOINTNAME_THUMB_1]);
+	ros::param::get("/zero/encoder_offset/j32",mEncoderOffset[eJOINTNAME_THUMB_2]);
+	ros::param::get("/zero/encoder_offset/j33",mEncoderOffset[eJOINTNAME_THUMB_3]);
+	
+	ros::param::get("/zero/encoder_direction/j00",mEncoderDirection[eJOINTNAME_INDEX_0]);
+	ros::param::get("/zero/encoder_direction/j01",mEncoderDirection[eJOINTNAME_INDEX_1]);
+	ros::param::get("/zero/encoder_direction/j02",mEncoderDirection[eJOINTNAME_INDEX_2]);
+	ros::param::get("/zero/encoder_direction/j03",mEncoderDirection[eJOINTNAME_INDEX_3]);
+	ros::param::get("/zero/encoder_direction/j10",mEncoderDirection[eJOINTNAME_MIDDLE_0]);
+	ros::param::get("/zero/encoder_direction/j11",mEncoderDirection[eJOINTNAME_MIDDLE_1]);
+	ros::param::get("/zero/encoder_direction/j12",mEncoderDirection[eJOINTNAME_MIDDLE_2]);
+	ros::param::get("/zero/encoder_direction/j13",mEncoderDirection[eJOINTNAME_MIDDLE_3]);
+	ros::param::get("/zero/encoder_direction/j20",mEncoderDirection[eJOINTNAME_PINKY_0]);
+	ros::param::get("/zero/encoder_direction/j21",mEncoderDirection[eJOINTNAME_PINKY_1]);
+	ros::param::get("/zero/encoder_direction/j22",mEncoderDirection[eJOINTNAME_PINKY_2]);
+	ros::param::get("/zero/encoder_direction/j23",mEncoderDirection[eJOINTNAME_PINKY_3]);
+	ros::param::get("/zero/encoder_direction/j30",mEncoderDirection[eJOINTNAME_THUMB_0]);
+	ros::param::get("/zero/encoder_direction/j31",mEncoderDirection[eJOINTNAME_THUMB_1]);
+	ros::param::get("/zero/encoder_direction/j32",mEncoderDirection[eJOINTNAME_THUMB_2]);
+	ros::param::get("/zero/encoder_direction/j33",mEncoderDirection[eJOINTNAME_THUMB_3]);
+	
+	ros::param::get("/zero/motor_direction/j00",mMotorDirection[eJOINTNAME_INDEX_0]);
+	ros::param::get("/zero/motor_direction/j01",mMotorDirection[eJOINTNAME_INDEX_1]);
+	ros::param::get("/zero/motor_direction/j02",mMotorDirection[eJOINTNAME_INDEX_2]);
+	ros::param::get("/zero/motor_direction/j03",mMotorDirection[eJOINTNAME_INDEX_3]);
+	ros::param::get("/zero/motor_direction/j10",mMotorDirection[eJOINTNAME_MIDDLE_0]);
+	ros::param::get("/zero/motor_direction/j11",mMotorDirection[eJOINTNAME_MIDDLE_1]);
+	ros::param::get("/zero/motor_direction/j12",mMotorDirection[eJOINTNAME_MIDDLE_2]);
+	ros::param::get("/zero/motor_direction/j13",mMotorDirection[eJOINTNAME_MIDDLE_3]);
+	ros::param::get("/zero/motor_direction/j20",mMotorDirection[eJOINTNAME_PINKY_0]);
+	ros::param::get("/zero/motor_direction/j21",mMotorDirection[eJOINTNAME_PINKY_1]);
+	ros::param::get("/zero/motor_direction/j22",mMotorDirection[eJOINTNAME_PINKY_2]);
+	ros::param::get("/zero/motor_direction/j23",mMotorDirection[eJOINTNAME_PINKY_3]);
+	ros::param::get("/zero/motor_direction/j30",mMotorDirection[eJOINTNAME_THUMB_0]);
+	ros::param::get("/zero/motor_direction/j31",mMotorDirection[eJOINTNAME_THUMB_1]);
+	ros::param::get("/zero/motor_direction/j32",mMotorDirection[eJOINTNAME_THUMB_2]);
+	ros::param::get("/zero/motor_direction/j33",mMotorDirection[eJOINTNAME_THUMB_3]);	
+	
 }
 
 
 controlAllegroHand::~controlAllegroHand()
 {
-	PRINT_INFO("Setting System OFF");
+	//PRINT_INFO("Setting System OFF");
+	ROS_INFO("Setting System OFF");
 	_writeDeviceMsg(ID_CMD_SET_SYSTEM_OFF, ID_DEVICE_MAIN, ID_COMMON);
 	usleep(10000);
 
 	if(CAN_Close(CanHandle))
 	{
-		PRINT_INFO("Error in CAN_Close()");
+		//PRINT_INFO("Error in CAN_Close()");
+		ROS_ERROR("Error in CAN_Close()");
 	}
 }
 
@@ -114,63 +128,76 @@ void controlAllegroHand::init(int mode)
 	int ret;
 	TPCANRdMsg lmsg;
 
-	PRINT_INFO("Opening CAN device");
+	//PRINT_INFO("Opening CAN device");
+	ROS_INFO("CAN: Opening device");
+	
 
 	CanHandle = LINUX_CAN_Open("/dev/pcan32", O_RDWR);
 	if (!CanHandle)
 	{
-		PRINT_INFO("Error in CAN_Open()");
+		//PRINT_INFO("Error in CAN_Open()");
+		ROS_ERROR("CAN: Error in CAN_Open()");
 	}
 
 	char txt[VERSIONSTRING_LEN];
 	ret = CAN_VersionInfo(CanHandle, txt);
 	if (!ret)
 	{
-		PRINT_INFO(txt);
+		//PRINT_INFO(txt);
+		ROS_INFO("CAN: %s", txt);
 	}
 	else {
-		PRINT_INFO("Error getting CAN_VersionInfo()");
+		//PRINT_INFO("Error getting CAN_VersionInfo()");
+		ROS_ERROR("CAN: Error in CAN_VersionInfo()");
 	}
 
-	PRINT_INFO("Initializing CAN device");
+	//PRINT_INFO("Initializing CAN device");
+	ROS_INFO("CAN: Initializing device");
 	// init to an user defined bit rate
 	ret = CAN_Init(CanHandle, CAN_BAUD_1M, CAN_INIT_TYPE_ST);
 	if (ret)
 	{
-		PRINT_INFO("Error in CAN_Init()");
+		//PRINT_INFO("Error in CAN_Init()");
+		ROS_ERROR("CAN: Error in CAN_Init()");
 	}
 
-	PRINT_INFO("Clear the can buffer");
+	//PRINT_INFO("Clear the can buffer");
+	ROS_INFO("CAN: Clearing the CAN buffer");
 	for(int i=0; i<100; i++){
 		LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 1000); // polding
 	}
 
-	PRINT_INFO("System off");
+	//PRINT_INFO("System off");
+	ROS_INFO("CAN: System off");
 	_writeDeviceMsg(ID_CMD_SET_SYSTEM_OFF, ID_DEVICE_MAIN, ID_COMMON);
 	usleep(100);
 
-	PRINT_INFO("Setting loop period = 3 ms");
+	//PRINT_INFO("Setting loop period = 3 ms");
+	ROS_INFO("CAN: Setting loop period = 3 ms");
 	//data[0] = (char)(ALLEGRO_CONTROL_TIME_INTERVAL * 1000.);
 	data[0] = 3;
 	_writeDeviceMsg(ID_CMD_SET_PERIOD, ID_DEVICE_MAIN, ID_COMMON, 1, data );
 	usleep(100);
 
-	PRINT_INFO("Setting task mode");
+	//PRINT_INFO("Setting task mode");
+	ROS_INFO("CAN: Setting task mode");
 	_writeDeviceMsg(ID_CMD_SET_MODE_TASK, ID_DEVICE_MAIN, ID_COMMON);
 	usleep(100);
 
-	PRINT_INFO("Setting System ON");
+	//PRINT_INFO("Setting System ON");
+	ROS_INFO("CAN: Setting System ON");
 	_writeDeviceMsg(ID_CMD_SET_SYSTEM_ON, ID_DEVICE_MAIN, ID_COMMON);
 	usleep(100);
 
 	for(int i=0; i<100; i++) ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 0);
 
-	PRINT_INFO("Setting joint query command");
+	//PRINT_INFO("Setting joint query command");
+	ROS_INFO("CAN: Setting joint query command");
 	_writeDeviceMsg(ID_CMD_QUERY_STATE_DATA, ID_DEVICE_MAIN, ID_COMMON);
 	usleep(100);
 
 	// wait for the first command
-	PRINT_INFO("Wait for first joint command");
+	//PRINT_INFO("Wait for first joint command");
 	int cnt = 0;
 	int itr = 0;
 	double q[4];
@@ -194,7 +221,8 @@ void controlAllegroHand::init(int mode)
 		}
 	}
 
-	cout << "started" << endl;
+	//cout << "started" << endl;
+	ROS_INFO("CAN: Communicating");
 }
 
 int controlAllegroHand::update(void)
@@ -321,10 +349,29 @@ void controlAllegroHand::_writeDevices()
 		pwm[i] = (short)pwmDouble[i];
 	}
 	
-	//pwm[eJOINTNAME_PINKY_0] = 0;
-	//pwm[eJOINTNAME_PINKY_1] = 0;
-	//pwm[eJOINTNAME_PINKY_2] = 0;
-	//pwm[eJOINTNAME_PINKY_3] = 0;
+	
+	// ZEROS FOR TESTING
+        /*
+	pwm[eJOINTNAME_INDEX_0] = 0;
+	pwm[eJOINTNAME_INDEX_1] = 0;
+	pwm[eJOINTNAME_INDEX_2] = 0;
+	pwm[eJOINTNAME_INDEX_3] = 0;
+	pwm[eJOINTNAME_MIDDLE_0] = 0;
+	pwm[eJOINTNAME_MIDDLE_1] = 0;
+	pwm[eJOINTNAME_MIDDLE_2] = 0;
+	pwm[eJOINTNAME_MIDDLE_3] = 0;
+	pwm[eJOINTNAME_PINKY_0] = 0;
+	pwm[eJOINTNAME_PINKY_1] = 0;
+	pwm[eJOINTNAME_PINKY_2] = 0;
+	pwm[eJOINTNAME_PINKY_3] = 0;
+	pwm[eJOINTNAME_THUMB_0] = 0;
+	pwm[eJOINTNAME_THUMB_1] = 0;
+	pwm[eJOINTNAME_THUMB_2] = 0;
+	pwm[eJOINTNAME_THUMB_3] = 0;
+        */
+
+
+
 
 	for(int findex=0; findex<4; findex++ ){
 		data[0] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
@@ -365,6 +412,7 @@ void controlAllegroHand::_writeDeviceMsg(DWORD command, DWORD from, DWORD to, BY
 	if(CAN_Write(CanHandle, &msg1))
 	{
 		cout << "CAN communication error (write)" << endl;
+		ROS_ERROR("CAN: Write error");
 		mEmergencyStop = true;
 	}
 
@@ -429,7 +477,8 @@ char controlAllegroHand::_parseCANMsg(TPCANMsg read_msg,  double *values)
 		return 0;
 		break;
 	default:
-		printf("unknown command %d, src %d, to %d, len %d \n", cmd, src, to, len);
+		//printf("unknown command %d, src %d, to %d, len %d \n", cmd, src, to, len);
+		ROS_WARN("unknown command %d, src %d, to %d, len %d", cmd, src, to, len);
 		/*
 		for(int nd=0; nd<len; nd++)
 		{
