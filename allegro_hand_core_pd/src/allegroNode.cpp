@@ -27,6 +27,9 @@
 #include "ros/service_server.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Float32.h"
+
+#include <XmlRpcValue.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -34,6 +37,7 @@
 #include <string>
 
 #include "controlAllegroHand.h"
+
 
 #define RADIANS_TO_DEGREES(radians) ((radians) * (180.0 / M_PI))
 #define DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
@@ -57,9 +61,35 @@ double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
 double desired_position[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
-double k_p[DOF_JOINTS];
-double k_d[DOF_JOINTS];
+double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
+										600.0,  600.0,  600.0, 1000.0,
+										600.0,  600.0,  600.0, 1000.0,
+									   1000.0, 1000.0, 1000.0,  600.0 };
 
+double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
+										 15.0,   20.0,   15.0,   15.0,
+										 15.0,   20.0,   15.0,   15.0,
+										 30.0,   20.0,   20.0,   15.0 };
+
+double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
+										  0.0,  -10.0,   45.0,   45.0,
+										  5.0,   -5.0,   50.0,   45.0,
+					   				     60.0,   25.0,   15.0,   45.0 };
+
+std::string pGainParams[DOF_JOINTS] = {	"/gains/p/j00", "/gains/p/j01", "/gains/p/j02", "/gains/p/j03", 
+										"/gains/p/j10", "/gains/p/j11", "/gains/p/j12", "/gains/p/j13",
+										"/gains/p/j20", "/gains/p/j21", "/gains/p/j22", "/gains/p/j23", 
+										"/gains/p/j30", "/gains/p/j31", "/gains/p/j32", "/gains/p/j33", };
+
+std::string dGainParams[DOF_JOINTS] = {	"/gains/d/j00", "/gains/d/j01", "/gains/d/j02", "/gains/d/j03", 
+										"/gains/d/j10", "/gains/d/j11", "/gains/d/j12", "/gains/d/j13",
+										"/gains/d/j20", "/gains/d/j21", "/gains/d/j22", "/gains/d/j23", 
+										"/gains/d/j30", "/gains/d/j31", "/gains/d/j32", "/gains/d/j33", };
+
+std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
+										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
+									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
+										   "joint_12.0",    "joint_13.0",  "joint_14.0",  "joint_15.0" };
 
 
 int frame = 0;
@@ -99,6 +129,7 @@ void SetjointCallback(const sensor_msgs::JointState& msg)
 	mutex->unlock();	
 }
 
+
 // Called when an external (string) message is received
 void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -125,21 +156,23 @@ void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 // every 0.003 seconds
 void timerCallback(const ros::TimerEvent& event)
 {
+
 	// Calculate loop time;
 	tnow = ros::Time::now();
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
 	
-/*  ================================= 
-    =          UPDATE GAINS         = 
-    ================================= */	
-	// Read the gains.yaml file every iteration
-	// This will allow us to update gains on the fly for tuning!
+	if ((1/dt)>400)
+		printf("%f\n",(1/dt-333.33333));
+	
 		
 	// save last iteration info
-	for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
-	for(int i=0; i<DOF_JOINTS; i++) previous_position_filtered[i] = current_position_filtered[i];
-	for(int i=0; i<DOF_JOINTS; i++) previous_velocity[i] = current_velocity[i];
+	for(int i=0; i<DOF_JOINTS; i++)
+	{
+		previous_position[i] = current_position[i];
+		previous_position_filtered[i] = current_position_filtered[i];
+		previous_velocity[i] = current_velocity[i];
+	}
 		
 		
 /*  ================================= 
@@ -192,19 +225,17 @@ void timerCallback(const ros::TimerEvent& event)
 
 		
 	// PUBLISH current position, velocity and effort (torque)
-	msgJoint.header.stamp 									= tnow;
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
-	
-	//for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
-	
+	msgJoint.header.stamp 		= tnow;	
+	for(int i=0; i<DOF_JOINTS; i++)
+	{
+		msgJoint.position[i] 	= current_position[i];
+		msgJoint.velocity[i] 	= current_velocity[i];
+		msgJoint.effort[i] 		= desired_torque[i];
+	}
 	joint_state_pub.publish(msgJoint);
 		
-		
 	frame++;
+	
 
 } // end timerCallback
 
@@ -218,68 +249,13 @@ void timerCallback(const ros::TimerEvent& event)
 int main(int argc, char** argv)
 {
 
-k_p[0]  = 600;
-k_p[1]  = 600;
-k_p[2]  = 600;
-k_p[3]  = 1000;
-k_p[4]  = 600;
-k_p[5]  = 600;
-k_p[6]  = 600;
-k_p[7]  = 1000;
-k_p[8]  = 600;
-k_p[9]  = 600;
-k_p[10] = 600;
-k_p[11] = 1000;
-k_p[12] = 1000;
-k_p[13] = 1000;
-k_p[14] = 1000;
-k_p[15] = 600;
-
-k_d[0]  = 15;
-k_d[1]  = 20;
-k_d[2]  = 15;
-k_d[3]  = 15;
-k_d[4]  = 15;
-k_d[5]  = 20;
-k_d[6]  = 15;
-k_d[7]  = 15;
-k_d[8]  = 15;
-k_d[9]  = 20;
-k_d[10] = 15;
-k_d[11] = 15;
-k_d[12] = 30;
-k_d[13] = 20;
-k_d[14] = 20;
-k_d[15] = 15;
-
-desired_position[0]  = DEGREES_TO_RADIANS(0.0);
-desired_position[1]  = DEGREES_TO_RADIANS(-10.0);
-desired_position[2]  = DEGREES_TO_RADIANS(45.0);
-desired_position[3]  = DEGREES_TO_RADIANS(45.0);
-desired_position[4]  = DEGREES_TO_RADIANS(0.0);
-desired_position[5]  = DEGREES_TO_RADIANS(-10.0);
-desired_position[6]  = DEGREES_TO_RADIANS(45.0);
-desired_position[7]  = DEGREES_TO_RADIANS(45.0);
-desired_position[8]  = DEGREES_TO_RADIANS(5.0);
-desired_position[9]  = DEGREES_TO_RADIANS(-5.0);
-desired_position[10] = DEGREES_TO_RADIANS(50.0);
-desired_position[11] = DEGREES_TO_RADIANS(45.0);
-desired_position[12] = DEGREES_TO_RADIANS(60.0);
-desired_position[13] = DEGREES_TO_RADIANS(25.0);
-desired_position[14] = DEGREES_TO_RADIANS(15.0);
-desired_position[15] = DEGREES_TO_RADIANS(45.0);
-
-
-
-
-
 	using namespace std;
 	
 	ros::init(argc, argv, "allegro_hand_core");
 	ros::Time::init();
 	
 	ros::NodeHandle nh;
-
+	
 	// Setup timer callback (ALLEGRO_CONTROL_TIME_INTERVAL = 0.003)
 	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
 
@@ -296,34 +272,57 @@ desired_position[15] = DEGREES_TO_RADIANS(45.0);
 	msgJoint.effort.resize(DOF_JOINTS);
 	msgJoint.name.resize(DOF_JOINTS);
 
-	// Joint names (for use with joint_state_publisher GUI - matches URDF)
-	msgJoint.name[0]  = "joint_0.0";
-	msgJoint.name[1]  = "joint_1.0";
-	msgJoint.name[2]  = "joint_2.0";
-	msgJoint.name[3]  = "joint_3.0";
-	msgJoint.name[4]  = "joint_4.0";
-	msgJoint.name[5]  = "joint_5.0";
-	msgJoint.name[6]  = "joint_6.0";
-	msgJoint.name[7]  = "joint_7.0";
-	msgJoint.name[8]  = "joint_8.0";
-	msgJoint.name[9]  = "joint_9.0";
-	msgJoint.name[10] = "joint_10.0";
-	msgJoint.name[11] = "joint_11.0";
-	msgJoint.name[12] = "joint_12.0";
-	msgJoint.name[13] = "joint_13.0";
-	msgJoint.name[14] = "joint_14.0";
-	msgJoint.name[15] = "joint_15.0";
 
+	// Joint names (for use with joint_state_publisher GUI - matches URDF)
+	for(int i=0; i<DOF_JOINTS; i++)	msgJoint.name[i] = jointNames[i];	
+	
 	
 	// Get Allegro Hand information from parameter server
 	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
 	string robot_name, whichHand, manufacturer, origin, serial, version;
-	ros::param::get("/hand_info/robot_name",robot_name);
-	ros::param::get("/hand_info/which_hand",whichHand);
-	ros::param::get("/hand_info/manufacturer",manufacturer);
-	ros::param::get("/hand_info/origin",origin);
-	ros::param::get("/hand_info/serial",serial);
-	ros::param::get("/hand_info/version",version);
+	ros::param::get("~hand_info/robot_name",robot_name);
+	ros::param::get("~hand_info/which_hand",whichHand);
+	ros::param::get("~hand_info/manufacturer",manufacturer);
+	ros::param::get("~hand_info/origin",origin);
+	ros::param::get("~hand_info/serial",serial);
+	ros::param::get("~hand_info/version",version);
+
+
+	// set gains via gains.yaml or to defaul values
+	if (ros::param::has("~gains"))
+	{
+		ROS_INFO("CTRL: PD gains loaded from param server.");
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			ros::param::get(pGainParams[i], k_p[i]);
+			ros::param::get(dGainParams[i], k_d[i]);
+			printf("%f ", k_p[i]);
+		}
+		printf("\n");
+	}
+	else
+	{
+		// gains will be loaded every control iteration
+		ROS_WARN("CTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains.yaml\nLoading default PD gains...");
+	}
+
+
+	// set initial position via initial_position.yaml or to defaul values
+	if (ros::param::has("~initial_position"))
+	{
+		ROS_INFO("CTRL: Initial Pose loaded from param server.");
+		
+/*  ================================= 
+    =       LOAD VALUES HERE        =   
+    ================================= */
+    
+	}
+	else
+	{
+		ROS_WARN("Initial postion not loaded.\nCheck launch file is loading /parameters/initialPose.yaml\nLoading Home position instead...");
+		// Home position
+		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);										
+	}
 
 
 	// Initialize CAN device

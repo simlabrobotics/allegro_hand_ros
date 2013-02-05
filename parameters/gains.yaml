@@ -1,50 +1,40 @@
 # get gains from library
 # p and d gains for all 16 joints - 32 total
 
-# finger 0 (Index)
-gains/00/p: 600
-gains/01/p: 600
-gains/02/p: 600
-gains/03/p: 1000
+# proportial
+gains:
+ p:
+  j00: 600
+  j01: 600
+  j02: 600
+  j03: 1000
+  j10: 600
+  j11: 600
+  j12: 600
+  j13: 1000
+  j20: 600
+  j21: 600
+  j22: 600
+  j23: 1000
+  j30: 1000
+  j31: 1000
+  j32: 1000
+  j33: 600
 
-gains/00/d: 15
-gains/01/d: 20
-gains/02/d: 15
-gains/03/d: 15
-
-
-# finger 1 (Middle)
-gains/10/p: 600
-gains/11/p: 600
-gains/12/p: 600
-gains/13/p: 1000
-
-gains/10/d: 15
-gains/11/d: 20
-gains/12/d: 15
-gains/13/d: 15
-
-
-# finger 2 (Pinky)
-gains/20/p: 600
-gains/21/p: 600
-gains/22/p: 600
-gains/23/p: 1000
-
-gains/20/d: 15
-gains/21/d: 20
-gains/22/d: 15
-gains/23/d: 15
-
-
-# finger 3 (Thumb)
-gains/30/p: 1000
-gains/31/p: 1000
-gains/32/p: 1000
-gains/33/p: 600
-
-gains/30/d: 30
-gains/31/d: 20
-gains/32/d: 20
-gains/33/d: 15
-
+ d:
+  j00: 15
+  j01: 20
+  j02: 15
+  j03: 15
+  j10: 15
+  j11: 20
+  j12: 15
+  j13: 15
+  j20: 15
+  j21: 20
+  j22: 15
+  j23: 15
+  j30: 30
+  j31: 20
+  j32: 20
+  j33: 15  

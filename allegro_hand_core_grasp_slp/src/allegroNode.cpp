@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 
 	// Setup sleep rate
-	ros::Rate rate(1./ALLEGRO_CONTROL_TIME_INTERVAL);;
+	ros::Rate rate(1./ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	mutex = new boost::mutex();
 
