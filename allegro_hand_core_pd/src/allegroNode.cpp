@@ -1,7 +1,7 @@
 /*
  * allegroNode.cpp
  *
- *  Created on: Nov 14, 2012
+ *  Created on: Feb 1, 2013
  *  Authors: Alex ALSPACH, Seungsu KIM
  */
  
@@ -70,7 +70,7 @@ double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gain
 										 15.0,   20.0,   15.0,   15.0,
 										 15.0,   20.0,   15.0,   15.0,
 										 30.0,   20.0,   20.0,   15.0 };
-
+									
 double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
 										  0.0,  -10.0,   45.0,   45.0,
 										  5.0,   -5.0,   50.0,   45.0,
@@ -204,7 +204,9 @@ void timerCallback(const ros::TimerEvent& event)
     	current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
 		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
 		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
-	}
+	}	
+	
+	
 	
 /*  ================================= 
     =        POSITION CONTROL       =   
@@ -219,11 +221,6 @@ void timerCallback(const ros::TimerEvent& event)
 	}		
 
 
-/*  ================================= 
-    =   ADD VELOCITY SAT. CONTRL    =   
-    ================================= */
-
-		
 	// PUBLISH current position, velocity and effort (torque)
 	msgJoint.header.stamp 		= tnow;	
 	for(int i=0; i<DOF_JOINTS; i++)
@@ -255,6 +252,7 @@ int main(int argc, char** argv)
 	ros::Time::init();
 	
 	ros::NodeHandle nh;
+	
 	
 	// Setup timer callback (ALLEGRO_CONTROL_TIME_INTERVAL = 0.003)
 	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);

@@ -1,0 +1,6 @@
+<package>
+  <description brief="right_hand_simple_assembly_3">right_hand_simple_assembly_3</description>
+  <depend package="gazebo" />
+  <author>me</author>
+  <license>BSD</license>
+</package>

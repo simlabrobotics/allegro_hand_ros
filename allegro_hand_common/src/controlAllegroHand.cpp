@@ -22,7 +22,7 @@ void PRINT_INFO(const char *msg)
 controlAllegroHand::controlAllegroHand()
 {
 
-	if (ros::param::has("zero"))
+	if (ros::param::has("~zero"))
 	{
 		mEmergencyStop = false;		
 	}

@@ -4,12 +4,12 @@
 
 
 	
-	<param name="robot_description" textfile="$(find allegro_hand_urdf)/AllegroHand_Left.urdf"/>
+	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_right.urdf"/>
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
     
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_urdf)/allegro_hand_config.vcg" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" />
     
     
     

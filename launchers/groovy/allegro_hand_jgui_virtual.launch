@@ -1,5 +1,5 @@
 <launch>
-	<arg name="model" default="$(find allegro_hand_urdf)/AllegroHand_Left.urdf"/>
+	<arg name="model" default="$(find allegro_hand_description)/AllegroHand_Left.urdf"/>
 	<arg name="gui" default="True" />
 	<param name="robot_description" textfile="$(arg model)" />
 	<param name="use_gui" value="$(arg gui)"/>

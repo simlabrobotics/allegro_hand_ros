@@ -7,25 +7,36 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+set(ROS_BUILD_TYPE RelWithDebInfo)
+
 
 rosbuild_init()
+
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
+
+
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
-rosbuild_add_executable(parser src/parser.cpp)
+link_directories(${PROJECT_SOURCE_DIR}/../allegro_hand_common/lib)
+rosbuild_add_executable(${PROJECT_NAME} src/allegroNode.cpp ../allegro_hand_common/src/controlAllegroHand.cpp)
+
+include_directories(../allegro_hand_common/include)
+target_link_libraries(${PROJECT_NAME} BHand pcan)
+
+rosbuild_link_boost(${PROJECT_NAME} thread)
+
+
