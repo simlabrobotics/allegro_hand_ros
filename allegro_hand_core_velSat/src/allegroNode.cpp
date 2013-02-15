@@ -63,6 +63,8 @@ double desired_position[DOF_JOINTS]				= {0.0};
 double desired_velocity[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
+double v[DOF_JOINTS] 							= {0.0};	
+
 double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
 										600.0,  600.0,  600.0, 1000.0,
 										600.0,  600.0,  600.0, 1000.0,
@@ -77,11 +79,7 @@ double v_max[DOF_JOINTS] 				= {  100.0,   100.0,   100.0,   100.0, // velocity 
 										  	 7.0,   20.0,   20.0,   10.0,
 										  	 7.0,   20.0,   20.0,   10.0,
 										    30.0,   10.0,   30.0,   15.0 };	
-										  	 
-double v[DOF_JOINTS] 				= {  1, 1, 1, 1,
-										 1, 1, 1, 1,
-										 1, 1, 1, 1,
-										 1, 1, 1, 1  };											  	 									 
+										  	 									  	 									 
 
 double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
 										  0.0,  -10.0,   45.0,   45.0,
@@ -101,7 +99,8 @@ std::string dGainParams[DOF_JOINTS] = {	"/gains/d/j00", "/gains/d/j01", "/gains/
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",    "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",  "joint_14.0",  "joint_15.0" };
+
 
 
 int frame = 0;
