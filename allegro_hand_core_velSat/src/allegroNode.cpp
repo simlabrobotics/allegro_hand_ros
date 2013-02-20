@@ -49,6 +49,10 @@
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define EXT_CMD_TOPIC "/allegroHand/external_cmd"
 
+#define JOINT_DESIRED_TOPIC "/allegroHand/joint_desired_states"
+#define JOINT_CURRENT_TOPIC "/allegroHand/joint_current_states"
+
+
 double current_position[DOF_JOINTS] 			= {0.0};
 double previous_position[DOF_JOINTS]			= {0.0};
 
@@ -63,21 +67,44 @@ double desired_position[DOF_JOINTS]				= {0.0};
 double desired_velocity[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
+
 double v[DOF_JOINTS] 							= {0.0};	
+
+
+double k_p[DOF_JOINTS] 				= { 0.0,  0.0,  0.0, 0.0,  // default P gains
+										0.0,  0.0,  0.0, 0.0,
+										0.0,  1500.0,  0.0, 0.0, // 2000
+									   0.0, 0.0, 0.0,  0.0 };
+
+/*
 
 double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
 										600.0,  600.0,  600.0, 1000.0,
 										600.0,  600.0,  600.0, 1000.0,
 									   1000.0, 1000.0, 1000.0,  600.0 };
+									   
+									   
+double k_p[DOF_JOINTS] 				= { 0.0,  0.0,  0.0, 0.0,  // default P gains
+										0.0,  0.0,  0.0, 0.0,
+										0.0,  0.2,  0.0, 0.0,
+									   0.0, 0.0, 0.0,  0.0 };
+
+*/
 
 double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
 										 15.0,   20.0,   15.0,   15.0,
-										 15.0,   20.0,   15.0,   15.0,
+										  15.0,   200.0,   15.0,   15.0, //200
 										 30.0,   20.0,   20.0,   15.0 };
-										 
+
+/*										 
+double k_d[DOF_JOINTS] 				= {  0.0,   0.0,   0.0,   0.0,  // default D gains
+										 0.0,   0.0,   0.0,   0.0,
+										 0.005,   1.0,   0.01,   0.01,
+										 0.0,   0.0,   0.0,   0.0 };										 
+*/										 
 double v_max[DOF_JOINTS] 				= {  100.0,   100.0,   100.0,   100.0, // velocity limits // 35 seems to be the min without effect
-										  	 7.0,   20.0,   20.0,   10.0,
-										  	 7.0,   20.0,   20.0,   10.0,
+										  	 7.0,   1.0,   20.0,   10.0,
+										  	 7.0,   5.0,   7.0,   7.0,
 										    30.0,   10.0,   30.0,   15.0 };	
 										  	 									  	 									 
 
@@ -112,9 +139,14 @@ boost::mutex *mutex;
 
 // ROS Messages
 ros::Publisher joint_state_pub;
+ros::Publisher joint_desired_state_pub;
+ros::Publisher joint_current_state_pub;
+
 ros::Subscriber joint_cmd_sub;		// handles external joint command (eg. sensor_msgs/JointState)
 ros::Subscriber external_cmd_sub;	// handles any other type of eternal command (eg. std_msgs/String)
 sensor_msgs::JointState msgJoint;
+sensor_msgs::JointState msgJoint_desired;
+sensor_msgs::JointState msgJoint_current;
 std::string  ext_cmd;
 
 // ROS Time
@@ -173,8 +205,8 @@ void timerCallback(const ros::TimerEvent& event)
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
 	
-	if ((1/dt)>400)
-		printf("%f\n",(1/dt-333.33333));
+	//if ((1/dt)>400)
+	//	printf("%f\n",(1/dt-333.33333));
 	
 		
 	// save last iteration info
@@ -227,7 +259,7 @@ void timerCallback(const ros::TimerEvent& event)
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
 		desired_velocity[i] = (k_p[i]/k_d[i])*(desired_position[i] - current_position_filtered[i]);
-		v[i] = std::min( 1.0, v_max[i]/abs(desired_velocity[i]) );
+		v[i] = std::min( 1.0, v_max[i]/fabs(desired_velocity[i]) ); // absolute value for floats
 	} 		
 	
 	
@@ -241,6 +273,7 @@ void timerCallback(const ros::TimerEvent& event)
 		{
 			//desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
 			desired_torque[i] = -k_d[i]*( current_velocity_filtered[i] - v[i]*desired_velocity[i] );
+			//desired_torque[i] = desired_torque[i]/800.0;
 			desired_torque[i] = desired_torque[i]/800.0;
 		}
 	}		
@@ -248,14 +281,38 @@ void timerCallback(const ros::TimerEvent& event)
 
 		
 	// PUBLISH current position, velocity and effort (torque)
-	msgJoint.header.stamp 		= tnow;	
+	msgJoint.header.stamp 		= tnow;
+	msgJoint_desired.header.stamp 		= tnow;
+	msgJoint_current.header.stamp 		= tnow;	
 	for(int i=0; i<DOF_JOINTS; i++)
 	{
-		msgJoint.position[i] 	= current_position[i];
-		msgJoint.velocity[i] 	= current_velocity[i];
+		msgJoint.position[i] 	= current_position_filtered[i];
+		msgJoint.velocity[i] 	= current_velocity_filtered[i];
 		msgJoint.effort[i] 		= desired_torque[i];
+		//msgJoint.effort[i] 		= desired_velocity[i]*v[i];
+		
+		msgJoint_desired.position[i] = desired_position[i];
+		msgJoint_desired.velocity[i] = desired_velocity[i]*v[i];
+		msgJoint_desired.effort[i] = desired_torque[i];
+		
+		msgJoint_current.position[i] = current_position_filtered[i];
+		msgJoint_current.velocity[i] = current_velocity_filtered[i];
+		msgJoint_current.effort[i] = v_max[i]/fabs(desired_velocity[i]);// 0.0;	// just for plotting, not current torque
 	}
+	
+	//if (fabs(desired_velocity[5])==0.0)
+	//printf("desired vel 5: %f\n", desired_velocity[5]);
+	
+	/*
+	
+	rxplot /allegroHand/joint_desired_states/position[5],/allegroHand/joint_current_states/position[5] /allegroHand/joint_desired_states/velocity[5],/allegroHand/joint_current_states/velocity[5] /allegroHand/joint_current_states/effort[5]
+	
+	*/
+	
+	
 	joint_state_pub.publish(msgJoint);
+	joint_desired_state_pub.publish(msgJoint_desired);
+	joint_current_state_pub.publish(msgJoint_current);
 		
 	frame++;
 	
@@ -287,6 +344,9 @@ int main(int argc, char** argv)
 
 	// Publisher and Subscribers
 	joint_state_pub = nh.advertise<sensor_msgs::JointState>(JOINT_STATE_TOPIC, 3);
+	joint_desired_state_pub = nh.advertise<sensor_msgs::JointState>(JOINT_DESIRED_TOPIC, 3);
+	joint_current_state_pub = nh.advertise<sensor_msgs::JointState>(JOINT_CURRENT_TOPIC, 3);
+	
 	joint_cmd_sub = nh.subscribe(JOINT_CMD_TOPIC, 3, SetjointCallback);
 	external_cmd_sub = nh.subscribe(EXT_CMD_TOPIC, 1, extCmdCallback);
 	
@@ -295,6 +355,16 @@ int main(int argc, char** argv)
 	msgJoint.velocity.resize(DOF_JOINTS);
 	msgJoint.effort.resize(DOF_JOINTS);
 	msgJoint.name.resize(DOF_JOINTS);
+	
+	msgJoint_desired.position.resize(DOF_JOINTS);
+	msgJoint_desired.velocity.resize(DOF_JOINTS);
+	msgJoint_desired.effort.resize(DOF_JOINTS);
+	msgJoint_desired.name.resize(DOF_JOINTS);
+	
+	msgJoint_current.position.resize(DOF_JOINTS);
+	msgJoint_current.velocity.resize(DOF_JOINTS);
+	msgJoint_current.effort.resize(DOF_JOINTS);
+	msgJoint_current.name.resize(DOF_JOINTS);
 
 
 	// Joint names (for use with joint_state_publisher GUI - matches URDF)
