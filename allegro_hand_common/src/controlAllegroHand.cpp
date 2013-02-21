@@ -389,8 +389,8 @@ void controlAllegroHand::_writeDevices()
 	}
 
 	// send message to call joint position and torque query
-	//_writeDeviceMsg(ID_CMD_QUERY_STATE_DATA, ID_DEVICE_MAIN, ID_COMMON);
-	//usleep(10);
+	// _writeDeviceMsg(ID_CMD_QUERY_STATE_DATA, ID_DEVICE_MAIN, ID_COMMON);
+	// usleep(10);
 }
 
 void controlAllegroHand::_writeDeviceMsg(DWORD command, DWORD from, DWORD to, BYTE len, unsigned char *data)

@@ -70,12 +70,6 @@ double desired_torque[DOF_JOINTS] 				= {0.0};
 
 double v[DOF_JOINTS] 							= {0.0};	
 
-
-double k_p[DOF_JOINTS] 				= { 0.0,  0.0,  0.0, 0.0,  // default P gains
-										0.0,  0.0,  0.0, 0.0,
-										0.0,  1500.0,  0.0, 0.0, // 2000
-									   0.0, 0.0, 0.0,  0.0 };
-
 /*
 
 double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
@@ -89,23 +83,58 @@ double k_p[DOF_JOINTS] 				= { 0.0,  0.0,  0.0, 0.0,  // default P gains
 										0.0,  0.2,  0.0, 0.0,
 									   0.0, 0.0, 0.0,  0.0 };
 
+
+double k_p[DOF_JOINTS] 				= { 700.0,  1000.0,  1200.0, 1200.0,  // default P gains
+										700.0,  1000.0,  1200.0, 1200.0,
+										700.0,  1000.0,  1200.0, 2000.0, // 2000
+									    2000.0,  700.0,  1000.0, 1000.0 };
+									    
+double k_d[DOF_JOINTS] 				= {  90.0,   140.0,   190.0,   190.0,  // default D gains
+										 90.0,   140.0,   190.0,   190.0,
+										 90.0,   140.0,   190.0,   190.0, //200
+										 110.0,   120.0,   190.0,   190.0 };
+*/
+	
+	
+	/*
+// almost working									    
+double k_p[DOF_JOINTS] 				= { 700.0,  0.0,  1700.0, 1700.0,  // default P gains
+										700.0,  0.0,  1700.0, 1700.0,
+										700.0,  1700.0,  1700.0, 1700.0, // 2000
+									    1700.0,  700.0,  1700.0, 1700.0 }; 
+
+double k_d[DOF_JOINTS] 				= {  90.0,   100.0,   100.0,   100.0,  // default D gains
+										 90.0,   100.0,   100.0,   100.0,
+										 90.0,   100.0,   100.0,   100.0, //200
+										 100.0,   90.0,   100.0,   100.0 };
+
 */
 
-double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
-										 15.0,   20.0,   15.0,   15.0,
-										  15.0,   200.0,   15.0,   15.0, //200
-										 30.0,   20.0,   20.0,   15.0 };
 
 /*										 
 double k_d[DOF_JOINTS] 				= {  0.0,   0.0,   0.0,   0.0,  // default D gains
 										 0.0,   0.0,   0.0,   0.0,
 										 0.005,   1.0,   0.01,   0.01,
-										 0.0,   0.0,   0.0,   0.0 };										 
-*/										 
-double v_max[DOF_JOINTS] 				= {  100.0,   100.0,   100.0,   100.0, // velocity limits // 35 seems to be the min without effect
-										  	 7.0,   1.0,   20.0,   10.0,
-										  	 7.0,   5.0,   7.0,   7.0,
-										    30.0,   10.0,   30.0,   15.0 };	
+										 0.0,   0.0,   0.0,   0.0 };		
+															 
+*/							
+
+// from PD controller
+double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1200.0,  // default P gains
+										1200.0,  1200.0,  1200.0, 1200.0,
+										1200.0,  1200.0,  1200.0, 1200.0,
+									    1200.0,  1200.0,  1200.0, 1200.0 };
+
+double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   140.0,  // default D gains
+										 140.0,   140.0,   140.0,   140.0,
+										 140.0,   140.0,   140.0,   140.0,
+										 140.0,   140.0,   140.0,   140.0 };
+
+			 
+double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, // velocity limits // 35 seems to be the min without effect
+										  	 10.0,   10.0,   10.0,   10.0,
+										  	 10.0,   10.0,   10.0,   10.0, // with a max of 10, 6 is achieved
+										     10.0,   10.0,   10.0,   10.0 };	
 										  	 									  	 									 
 
 double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
@@ -152,6 +181,11 @@ std::string  ext_cmd;
 // ROS Time
 ros::Time tstart;
 ros::Time tnow;
+
+ros::Time canStart;
+ros::Time canEnd;
+double canTime;
+
 double secs;
 double dt;
 
@@ -205,9 +239,11 @@ void timerCallback(const ros::TimerEvent& event)
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
 	
-	//if ((1/dt)>400)
-	//	printf("%f\n",(1/dt-333.33333));
+	//dt = 0.003;
 	
+	//if ((1/dt)>400)
+	//printf("%f\n",(1/dt-333.33333));
+	//printf("%f\n",(dt));
 		
 	// save last iteration info
 	for(int i=0; i<DOF_JOINTS; i++)
@@ -221,9 +257,12 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =       CAN COMMUNICATION       = 
     ================================= */	
+     canStart = ros::Time::now();	
 	canDevice->setTorque(desired_torque);		// WRITE joint torque
 	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
 	canDevice->getJointInfo(current_position);	// READ current joint positions
+	 canEnd = ros::Time::now();	
+	 canTime = 1e-9*(canEnd - canStart).nsec;
 
 		
 		
@@ -245,6 +284,8 @@ void timerCallback(const ros::TimerEvent& event)
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
     	current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+    	
+    	//current_position_filtered[i] = current_position[i];
 		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
 		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
 	}
@@ -279,6 +320,37 @@ void timerCallback(const ros::TimerEvent& event)
 	}		
 
 
+
+////////////////////////////////////////
+/*  ================================= 
+    =       PD POSITION CONTROL     =   
+    ================================= 
+    
+double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
+										600.0,  600.0,  600.0, 1000.0,
+										600.0,  600.0,  600.0, 1000.0,
+									   1000.0, 1000.0, 1000.0,  600.0 };
+
+double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
+										 15.0,   20.0,   15.0,   15.0,
+										 15.0,   20.0,   15.0,   15.0,
+										 30.0,   20.0,   20.0,   15.0 };
+
+
+    if(frame>20) // give the low pass filters 20 iterations to build up good data.
+    {	
+		for(int i=0; i<DOF_JOINTS; i++)    
+		{
+			desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
+			desired_torque[i] = desired_torque[i]/800.0;
+		}
+	}		
+*/
+///////////////////////////////////////
+
+
+
+
 		
 	// PUBLISH current position, velocity and effort (torque)
 	msgJoint.header.stamp 		= tnow;
@@ -297,7 +369,7 @@ void timerCallback(const ros::TimerEvent& event)
 		
 		msgJoint_current.position[i] = current_position_filtered[i];
 		msgJoint_current.velocity[i] = current_velocity_filtered[i];
-		msgJoint_current.effort[i] = v_max[i]/fabs(desired_velocity[i]);// 0.0;	// just for plotting, not current torque
+		msgJoint_current.effort[i] = desired_torque[i]; //v_max[i]/fabs(desired_velocity[i]);// 0.0;	// just for plotting, not current torque
 	}
 	
 	//if (fabs(desired_velocity[5])==0.0)
