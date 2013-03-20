@@ -16,6 +16,9 @@
 	-->
 	<arg name="CONTROLLER" default="grasp"/>	
 	
+	
+	<!-- instead of reading this from the terminal, maybe instead it can read it from the parameter server? But then how would you isolate the hands? -->
+	
 	<!-- Default hand is the right hand -->
 	<arg name="WHICHHAND" default="right"/>	
 

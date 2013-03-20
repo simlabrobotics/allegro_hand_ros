@@ -39,9 +39,7 @@ controlAllegroHand::controlAllegroHand()
 	// This version number is used to in setting the finger motor CAN channels
 	// the channels used differ from versions 1.0 to 2.0
 	
-	//ros::param::get("~handencoder_offset/j00",hand_version);
 	ros::param::get("~hand_info/version",hand_version);
-	printf("\n\n\nHAND VERSION = %f\n\n\n",hand_version);
 
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
