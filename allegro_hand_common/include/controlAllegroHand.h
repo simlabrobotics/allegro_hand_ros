@@ -11,7 +11,7 @@
 
 #include <list>
 #include "BHand/BHand.h"
-#include "allgroCANProtocol.h"
+#include "allegroCANProtocol.h"
 #include <libpcan.h>
 #include <fcntl.h>
 #include <string>

@@ -35,7 +35,11 @@ double desired_position[DOF_JOINTS];
 double desired_torque[DOF_JOINTS];
 std::string  lib_cmd;
 
-
+std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
+										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
+									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
+										   "joint_12.0",   "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										  
 int frame = 0;
 
 // Flags
@@ -246,23 +250,8 @@ int main(int argc, char** argv)
 	msgJoint.effort.resize(DOF_JOINTS);
 	msgJoint.name.resize(DOF_JOINTS);
 
-	// Joint names
-	msgJoint.name[0]  = "joint_0.0";
-	msgJoint.name[1]  = "joint_1.0";
-	msgJoint.name[2]  = "joint_2.0";
-	msgJoint.name[3]  = "joint_3.0";
-	msgJoint.name[4]  = "joint_4.0";
-	msgJoint.name[5]  = "joint_5.0";
-	msgJoint.name[6]  = "joint_6.0";
-	msgJoint.name[7]  = "joint_7.0";
-	msgJoint.name[8]  = "joint_8.0";
-	msgJoint.name[9]  = "joint_9.0";
-	msgJoint.name[10] = "joint_10.0";
-	msgJoint.name[11] = "joint_11.0";
-	msgJoint.name[12] = "joint_12.0";
-	msgJoint.name[13] = "joint_13.0";
-	msgJoint.name[14] = "joint_14.0";
-	msgJoint.name[15] = "joint_15.0";
+	// Joint names (for use with joint_state_publisher GUI - matches URDF)
+	for(int i=0; i<DOF_JOINTS; i++)	msgJoint.name[i] = jointNames[i];	
 
 	
 	// Get Allegro Hand information from parameter server

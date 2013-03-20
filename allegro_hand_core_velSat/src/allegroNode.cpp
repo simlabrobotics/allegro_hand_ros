@@ -2,20 +2,16 @@
  * allegroNode.cpp
  *
  *  Created on: Feb 15, 2013
- *  Authors: Alex ALSPACH, Seungsu KIM
+ *  Authors: Alex ALSPACH
  */
  
 // CONTROL LOOP TEMPLATE 
 // Using  timer callback  
 
-// For the most basic torque control algorithm, 
-// you need only add code where it says:
-	// =============================== //
-	// = COMPUTE control torque here = //
-	// =============================== //	
-// in the timer callback below. 
-// READ, COMPUTE, and WRITE and PUBLISH
-// are contrained within this callback.
+//////////////////////////////////////////////////////
+// WARNING: THIS CONTROL CODE IS UNDER DEVELOPMENT ///
+// USE AT YOUR OWN RISK                            ///
+//////////////////////////////////////////////////////
  
 #include <iostream>
 #include <boost/thread/thread.hpp>
@@ -70,56 +66,9 @@ double desired_torque[DOF_JOINTS] 				= {0.0};
 
 double v[DOF_JOINTS] 							= {0.0};	
 
-/*
-
-double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
-										600.0,  600.0,  600.0, 1000.0,
-										600.0,  600.0,  600.0, 1000.0,
-									   1000.0, 1000.0, 1000.0,  600.0 };
-									   
-									   
-double k_p[DOF_JOINTS] 				= { 0.0,  0.0,  0.0, 0.0,  // default P gains
-										0.0,  0.0,  0.0, 0.0,
-										0.0,  0.2,  0.0, 0.0,
-									   0.0, 0.0, 0.0,  0.0 };
 
 
-double k_p[DOF_JOINTS] 				= { 700.0,  1000.0,  1200.0, 1200.0,  // default P gains
-										700.0,  1000.0,  1200.0, 1200.0,
-										700.0,  1000.0,  1200.0, 2000.0, // 2000
-									    2000.0,  700.0,  1000.0, 1000.0 };
-									    
-double k_d[DOF_JOINTS] 				= {  90.0,   140.0,   190.0,   190.0,  // default D gains
-										 90.0,   140.0,   190.0,   190.0,
-										 90.0,   140.0,   190.0,   190.0, //200
-										 110.0,   120.0,   190.0,   190.0 };
-*/
-	
-	
-	/*
-// almost working									    
-double k_p[DOF_JOINTS] 				= { 700.0,  0.0,  1700.0, 1700.0,  // default P gains
-										700.0,  0.0,  1700.0, 1700.0,
-										700.0,  1700.0,  1700.0, 1700.0, // 2000
-									    1700.0,  700.0,  1700.0, 1700.0 }; 
 
-double k_d[DOF_JOINTS] 				= {  90.0,   100.0,   100.0,   100.0,  // default D gains
-										 90.0,   100.0,   100.0,   100.0,
-										 90.0,   100.0,   100.0,   100.0, //200
-										 100.0,   90.0,   100.0,   100.0 };
-
-*/
-
-
-/*										 
-double k_d[DOF_JOINTS] 				= {  0.0,   0.0,   0.0,   0.0,  // default D gains
-										 0.0,   0.0,   0.0,   0.0,
-										 0.005,   1.0,   0.01,   0.01,
-										 0.0,   0.0,   0.0,   0.0 };		
-															 
-*/							
-
-// from PD controller
 double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1200.0,  // default P gains
 										1200.0,  1200.0,  1200.0, 1200.0,
 										1200.0,  1200.0,  1200.0, 1200.0,
@@ -131,13 +80,13 @@ double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   140.0,  // default D 
 										 140.0,   140.0,   140.0,   140.0 };
 
 			 
-double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, // velocity limits // 35 seems to be the min without effect
-										  	 10.0,   10.0,   10.0,   10.0,
-										  	 10.0,   10.0,   10.0,   10.0, // with a max of 10, 6 is achieved
+double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, 	// velocity limits 
+										  	 10.0,   10.0,   10.0,   10.0, 	// with a max of 10, 6 is achieved
+										  	 10.0,   10.0,   10.0,   10.0, 
 										     10.0,   10.0,   10.0,   10.0 };	
 										  	 									  	 									 
 
-double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
+double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  	// default (home) position (degrees)
 										  0.0,  -10.0,   45.0,   45.0,
 										  5.0,   -5.0,   50.0,   45.0,
 					   				     60.0,   25.0,   15.0,   45.0 };
@@ -320,37 +269,6 @@ void timerCallback(const ros::TimerEvent& event)
 	}		
 
 
-
-////////////////////////////////////////
-/*  ================================= 
-    =       PD POSITION CONTROL     =   
-    ================================= 
-    
-double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
-										600.0,  600.0,  600.0, 1000.0,
-										600.0,  600.0,  600.0, 1000.0,
-									   1000.0, 1000.0, 1000.0,  600.0 };
-
-double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
-										 15.0,   20.0,   15.0,   15.0,
-										 15.0,   20.0,   15.0,   15.0,
-										 30.0,   20.0,   20.0,   15.0 };
-
-
-    if(frame>20) // give the low pass filters 20 iterations to build up good data.
-    {	
-		for(int i=0; i<DOF_JOINTS; i++)    
-		{
-			desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
-			desired_torque[i] = desired_torque[i]/800.0;
-		}
-	}		
-*/
-///////////////////////////////////////
-
-
-
-
 		
 	// PUBLISH current position, velocity and effort (torque)
 	msgJoint.header.stamp 		= tnow;
@@ -361,7 +279,6 @@ double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gain
 		msgJoint.position[i] 	= current_position_filtered[i];
 		msgJoint.velocity[i] 	= current_velocity_filtered[i];
 		msgJoint.effort[i] 		= desired_torque[i];
-		//msgJoint.effort[i] 		= desired_velocity[i]*v[i];
 		
 		msgJoint_desired.position[i] = desired_position[i];
 		msgJoint_desired.velocity[i] = desired_velocity[i]*v[i];
@@ -372,15 +289,10 @@ double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gain
 		msgJoint_current.effort[i] = desired_torque[i]; //v_max[i]/fabs(desired_velocity[i]);// 0.0;	// just for plotting, not current torque
 	}
 	
-	//if (fabs(desired_velocity[5])==0.0)
-	//printf("desired vel 5: %f\n", desired_velocity[5]);
-	
 	/*
-	
+	// Use this to view relevant data
 	rxplot /allegroHand/joint_desired_states/position[5],/allegroHand/joint_current_states/position[5] /allegroHand/joint_desired_states/velocity[5],/allegroHand/joint_current_states/velocity[5] /allegroHand/joint_current_states/effort[5]
-	
 	*/
-	
 	
 	joint_state_pub.publish(msgJoint);
 	joint_desired_state_pub.publish(msgJoint_desired);
@@ -479,7 +391,7 @@ int main(int argc, char** argv)
 		ROS_INFO("CTRL: Initial Pose loaded from param server.");
 		
 /*  ================================= 
-    =       LOAD VALUES HERE        =   
+    =    TODO: LOAD VALUES HERE     =   
     ================================= */
     
 	}
