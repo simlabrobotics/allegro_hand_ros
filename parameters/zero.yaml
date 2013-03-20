@@ -9,7 +9,7 @@ hand_info:
  manufacturer: 'SimLab Co. Ltd.'
  origin: 'Seoul, South Korea'
  serial: 'SAH020AR010'
- version: '2.0'
+ version: 2.0
 
 zero:
  encoder_offset:

@@ -6,3 +6,16 @@ TODO:
 [ ] edit all launchers to load new urdf based on left vs. right
 
 [ ] add trigger callback to update gains, intial pose (or pose), max velocity
+
+
+EDIT ALL CONTROLLER FILES THAT PRINT HAND DATA TO:
+	string robot_name, whichHand, manufacturer, origin, serial;
+	double version;
+	ros::param::get("~hand_info/robot_name",robot_name);
+	ros::param::get("~hand_info/which_hand",whichHand);
+	ros::param::get("~hand_info/manufacturer",manufacturer);
+	ros::param::get("~hand_info/origin",origin);
+	ros::param::get("~hand_info/serial",serial);
+	ros::param::get("~hand_info/version",version);
+	
+HAVE One launcher and inputs of controller and hand (r/l)	

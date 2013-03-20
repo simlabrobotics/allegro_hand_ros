@@ -3,7 +3,7 @@
  *
  *  Created on: 		Nov 15, 2012
  *  Added to Project: 	Jan 17, 2013
- *  Author: 			Seungsu Kim
+ *  Author: 			Seungsu Kim & Alex Alspach
  */
 
 #include "controlAllegroHand.h"
@@ -11,8 +11,12 @@
 #include <math.h>
 #include <stdio.h>
 #include "ros/ros.h"
+#include <string>
 
 using namespace std;
+
+
+
 
 void PRINT_INFO(const char *msg)
 {
@@ -31,6 +35,13 @@ controlAllegroHand::controlAllegroHand()
 		ROS_ERROR("Encoder/Motor offsets and directions not loaded.\nCheck launch file is loading /parameters/zero.yaml\nShutting down...");
 		mEmergencyStop = true;
 	}
+	
+	// This version number is used to in setting the finger motor CAN channels
+	// the channels used differ from versions 1.0 to 2.0
+	
+	//ros::param::get("~handencoder_offset/j00",hand_version);
+	ros::param::get("~hand_info/version",hand_version);
+	printf("\n\n\nHAND VERSION = %f\n\n\n",hand_version);
 
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
@@ -370,10 +381,12 @@ void controlAllegroHand::_writeDevices()
 	pwm[eJOINTNAME_THUMB_2] = 0;
 	pwm[eJOINTNAME_THUMB_3] = 0;
         */
+	//pwm[eJOINTNAME_THUMB_1] = 0;
 
 
-
-
+if (hand_version == 1.0 )
+{
+	// for Allegro Hand v1.0
 	for(int findex=0; findex<4; findex++ ){
 		data[0] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
 		data[1] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
@@ -387,6 +400,29 @@ void controlAllegroHand::_writeDevices()
 		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
 		usleep(10);
 	}
+
+}
+else if (hand_version >= 2.0 )
+{
+	// for Allegro Hand v2.0
+	for(int findex=0; findex<4; findex++ ){
+		data[0] = (unsigned char)( (pwm[3+findex*4] >> 8) & 0x00ff);
+		data[1] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
+		data[2] = (unsigned char)( (pwm[2+findex*4] >> 8) & 0x00ff);
+		data[3] = (unsigned char)(  pwm[2+findex*4]       & 0x00ff);
+		data[4] = (unsigned char)( (pwm[1+findex*4] >> 8) & 0x00ff);
+		data[5] = (unsigned char)(  pwm[1+findex*4]       & 0x00ff);
+		data[6] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
+		data[7] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
+
+		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
+		usleep(10);
+	}
+}	
+else
+{
+		ROS_ERROR("CAN: Can not determine proper finger CAN channels. Check the Allegro Hand version number in 'zero.yaml'");
+}	
 
 	// send message to call joint position and torque query
 	// _writeDeviceMsg(ID_CMD_QUERY_STATE_DATA, ID_DEVICE_MAIN, ID_COMMON);

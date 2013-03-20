@@ -14,10 +14,11 @@
     
     
     
-    	<node name="allegro_hand" pkg="allegro_hand_core_grasp" type="allegro_hand_core_grasp" output="screen"></node>
+    	<node name="allegro_hand" pkg="allegro_hand_core_grasp" type="allegro_hand_core_grasp" output="screen">
 	
 	<rosparam file="parameters/zero.yaml" command="load" />
 	 	
+	 	</node>
 
 	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>

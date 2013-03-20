@@ -14,6 +14,7 @@
 #include "allgroCANProtocol.h"
 #include <libpcan.h>
 #include <fcntl.h>
+#include <string>
 
 #define ALLEGRO_CONTROL_TIME_INTERVAL 0.003
 
@@ -50,11 +51,15 @@ private:
 	double curr_torque[DOF_JOINTS];
 	double desired_position[DOF_JOINTS];
 	double desired_torque[DOF_JOINTS];
+	
+	double hand_version;
 
 	double mPWM_MAX[DOF_JOINTS];
 	int    mEncoderOffset[DOF_JOINTS];
 	int    mEncoderDirection[DOF_JOINTS];
 	int    mMotorDirection[DOF_JOINTS];
+	
+	//std::string hand_version;
 
 	volatile bool mEmergencyStop;
 

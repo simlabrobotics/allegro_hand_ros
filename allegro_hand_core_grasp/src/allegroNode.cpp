@@ -267,13 +267,14 @@ int main(int argc, char** argv)
 	
 	// Get Allegro Hand information from parameter server
 	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
-	string robot_name, whichHand, manufacturer, origin, serial, version;
-	ros::param::get("/hand_info/robot_name",robot_name);
-	ros::param::get("/hand_info/which_hand",whichHand);
-	ros::param::get("/hand_info/manufacturer",manufacturer);
-	ros::param::get("/hand_info/origin",origin);
-	ros::param::get("/hand_info/serial",serial);
-	ros::param::get("/hand_info/version",version);
+	string robot_name, whichHand, manufacturer, origin, serial;
+	double version;
+	ros::param::get("~hand_info/robot_name",robot_name);
+	ros::param::get("~hand_info/which_hand",whichHand);
+	ros::param::get("~hand_info/manufacturer",manufacturer);
+	ros::param::get("~hand_info/origin",origin);
+	ros::param::get("~hand_info/serial",serial);
+	ros::param::get("~hand_info/version",version);
 
 	// Initialize BHand controller
 	if (whichHand.compare("left") == 0)
@@ -293,7 +294,7 @@ int main(int argc, char** argv)
 	usleep(3000);
 	
 	// Dump Allegro Hand information to the terminal	
-	cout << endl << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
 	
 
 	// Initialize torque at zero
