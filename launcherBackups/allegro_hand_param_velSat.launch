@@ -1,0 +1,34 @@
+<launch>
+	
+	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_right.urdf"/>
+	
+	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
+        <remap from="joint_states" to="/allegroHand/joint_states"/>
+    </node>
+    
+
+	    \<node name="allegro_hand" pkg="allegro_hand_core_velSat" type="allegro_hand_core_velSat" output="screen">
+		<rosparam file="parameters/zero.yaml"  command="load" />
+		<!--<rosparam file="parameters/gains.yaml" command="load" />-->
+ 	</node>
+
+	<!--
+	    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" />    
+
+	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
+	-->
+	
+	<node pkg="rxtools" type="rxplot" name="plot_speed"
+      args="/allegroHand/joint_desired_states/position[9],/allegroHand/joint_current_states/position[9] /allegroHand/joint_desired_states/velocity[9],/allegroHand/joint_current_states/velocity[9] /allegroHand/joint_current_states/effort[9]" />
+	
+	
+	
+</launch>
+
+<!-- NOTES
+
+make -C allegro_hand_core_velSat/ && roslaunch allegro_hand_param_velSat.launch 
+
+rxplot /allegroHand/joint_desired_states/position[5],/allegroHand/joint_current_states/position[5] /allegroHand/joint_desired_states/velocity[5],/allegroHand/joint_current_states/velocity[5] /allegroHand/joint_current_states/effort[5]
+	
+-->

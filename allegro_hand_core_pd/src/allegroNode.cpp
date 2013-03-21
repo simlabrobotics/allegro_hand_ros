@@ -5,17 +5,8 @@
  *  Authors: Alex ALSPACH, Seungsu KIM
  */
  
-// CONTROL LOOP TEMPLATE 
-// Using  timer callback  
-
-// For the most basic torque control algorithm, 
-// you need only add code where it says:
-	// =============================== //
-	// = COMPUTE control torque here = //
-	// =============================== //	
-// in the timer callback below. 
-// READ, COMPUTE, and WRITE and PUBLISH
-// are contrained within this callback.
+// JOINT SPACE POSITION CONTROL
+// Using  timer callback 
  
 #include <iostream>
 #include <boost/thread/thread.hpp>
@@ -28,8 +19,6 @@
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Float32.h"
-
-#include <XmlRpcValue.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -162,8 +151,8 @@ void timerCallback(const ros::TimerEvent& event)
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
 	
-	if ((1/dt)>400)
-		printf("%f\n",(1/dt-333.33333));
+	//if ((1/dt)>400)
+	//	printf("%f\n",(1/dt-333.33333));
 	
 		
 	// save last iteration info
@@ -311,7 +300,7 @@ int main(int argc, char** argv)
 		ROS_INFO("CTRL: Initial Pose loaded from param server.");
 		
 /*  ================================= 
-    =       LOAD VALUES HERE        =   
+    =    TODO LOAD VALUES HERE      =   
     ================================= */
     
 	}

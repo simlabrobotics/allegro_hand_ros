@@ -6,7 +6,7 @@
  */
  
 // CONTROL LOOP TEMPLATE 
-// Using  timer callback  
+// Using sleep function
 
 // For the most basic torque control algorithm, 
 // you need only add code where it says:
@@ -60,14 +60,9 @@ boost::mutex *mutex;
 
 // ROS Messages
 ros::Publisher joint_state_pub;
-ros::Publisher joint_desired_state_pub;
-ros::Publisher joint_current_state_pub;
-
-ros::Subscriber joint_cmd_sub;				// Handles external joint command (eg. sensor_msgs/JointState)
-ros::Subscriber external_cmd_sub;			// Handles any other type of eternal command (eg. std_msgs/String)
-sensor_msgs::JointState msgJoint_desired;	// Desired Position, Desired Velocity, Desired Torque
-sensor_msgs::JointState msgJoint_current;	// Current Position, Current Velocity, NOTE: Current Torque Unavailable
-sensor_msgs::JointState msgJoint;			// Collects most relavent information in one message: Current Position, Current Velocity, Control Torque
+ros::Subscriber joint_cmd_sub;		// handles external joint command (eg. sensor_msgs/JointState)
+ros::Subscriber external_cmd_sub;	// handles any other type of eternal command (eg. std_msgs/String)
+sensor_msgs::JointState msgJoint;
 std::string  ext_cmd;
 
 // ROS Time
@@ -107,68 +102,6 @@ void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 }
 
 
-// In case of the Allegro Hand, this callback is processed
-// every 0.003 seconds
-void timerCallback(const ros::TimerEvent& event)
-{
-	// Calculate loop time;
-	tnow = ros::Time::now();
-	dt = 1e-9*(tnow - tstart).nsec;
-	tstart = tnow;
-		
-	// save last joint position for velocity calc
-	for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
-		
-		
-		
-		
-/*  ================================= 
-    =       CAN COMMUNICATION       = 
-    ================================= */	
-	canDevice->setTorque(desired_torque);		// WRITE joint torque
-	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
-	canDevice->getJointInfo(current_position);	// READ current joint positions
-
-		
-		
-				
-	// Stop program and shutdown node when Allegro Hand is switched off
-	if( lEmergencyStop < 0 )
-	{
-		ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
-		ros::shutdown();
-	}
-
-
-
-/*  ================================= 
-    =  COMPUTE CONTROL TORQUE HERE  =   
-    ================================= */	
-
-
-		
-	// PUBLISH current position, velocity and effort (torque)
-	msgJoint.header.stamp 									= tnow;
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
-	
-	for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
-	
-	joint_state_pub.publish(msgJoint);
-		
-		
-	frame++;
-
-} // end timerCallback
-
-
-
-
-
-
 
 
 int main(int argc, char** argv)
@@ -181,7 +114,8 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 
 	// Setup timer callback (ALLEGRO_CONTROL_TIME_INTERVAL = 0.003)
-	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
+	//ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
+	ros::Rate rate(1./ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	mutex = new boost::mutex();
 
@@ -226,8 +160,63 @@ int main(int argc, char** argv)
 	// Start ROS time
 	tstart = ros::Time::now();
 
-	// Starts control loop, message pub/subs and all other callbacks
-	ros::spin();			
+	while(ros::ok())
+	{
+	
+		// Calculate loop time;
+		tnow = ros::Time::now();
+		dt = 1e-9*(tnow - tstart).nsec;
+		tstart = tnow;
+		
+		// save last joint position for velocity calc
+		for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
+		
+		
+		
+		
+	/*  ================================= 
+		=       CAN COMMUNICATION       = 
+		================================= */	
+		canDevice->setTorque(desired_torque);		// WRITE joint torque
+		lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
+		canDevice->getJointInfo(current_position);	// READ current joint positions
+
+		
+		
+				
+		// Stop program and shutdown node when Allegro Hand is switched off
+		if( lEmergencyStop < 0 )
+		{
+			ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
+			ros::shutdown();
+		}
+
+
+
+	/*  ================================= 
+		=  COMPUTE CONTROL TORQUE HERE  =   
+		================================= */	
+
+
+		
+		// PUBLISH current position, velocity and effort (torque)
+		msgJoint.header.stamp 									= tnow;
+	
+		for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
+	
+		for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
+		for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
+	
+		for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
+	
+		joint_state_pub.publish(msgJoint);
+		
+		
+		frame++;
+	
+		ros::spinOnce();
+		rate.sleep();	
+	}		
 
 	// Clean shutdown: shutdown node, shutdown can, be polite.
 	nh.shutdown();

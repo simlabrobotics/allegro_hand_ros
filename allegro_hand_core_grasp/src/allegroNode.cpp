@@ -5,6 +5,9 @@
  *  Authors: Alex ALSPACH, Seungsu KIM
  */
  
+// GRASP LIBRARY INTERFACE
+// Using  timer callback  
+ 
 #include <iostream>
 #include <boost/thread/thread.hpp>
 #include <boost/date_time.hpp>

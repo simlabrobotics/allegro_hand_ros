@@ -5,8 +5,8 @@
  *  Authors: Alex ALSPACH
  */
  
-// CONTROL LOOP TEMPLATE 
-// Using  timer callback  
+// JOINT SPACE VELOCITY SATURATION CONTROL
+// Using  timer callback
 
 //////////////////////////////////////////////////////
 // WARNING: THIS CONTROL CODE IS UNDER DEVELOPMENT ///
@@ -25,11 +25,9 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Float32.h"
 
-#include <XmlRpcValue.h>
-
 #include <stdio.h>
 #include <math.h>
-#include <algorithm>    // std::min
+#include <algorithm>    // for std::min
 #include <iostream>
 #include <string>
 
@@ -120,11 +118,11 @@ ros::Publisher joint_state_pub;
 ros::Publisher joint_desired_state_pub;
 ros::Publisher joint_current_state_pub;
 
-ros::Subscriber joint_cmd_sub;		// handles external joint command (eg. sensor_msgs/JointState)
-ros::Subscriber external_cmd_sub;	// handles any other type of eternal command (eg. std_msgs/String)
-sensor_msgs::JointState msgJoint;
-sensor_msgs::JointState msgJoint_desired;
-sensor_msgs::JointState msgJoint_current;
+ros::Subscriber joint_cmd_sub;				// Handles external joint command (eg. sensor_msgs/JointState)
+ros::Subscriber external_cmd_sub;			// Handles any other type of eternal command (eg. std_msgs/String)
+sensor_msgs::JointState msgJoint_desired;	// Desired Position, Desired Velocity, Desired Torque
+sensor_msgs::JointState msgJoint_current;	// Current Position, Current Velocity, NOTE: Current Torque Unavailable
+sensor_msgs::JointState msgJoint;			// Collects most relavent information in one message: Current Position, Current Velocity, Control Torque
 std::string  ext_cmd;
 
 // ROS Time
@@ -271,7 +269,7 @@ void timerCallback(const ros::TimerEvent& event)
 
 		
 	// PUBLISH current position, velocity and effort (torque)
-	msgJoint.header.stamp 		= tnow;
+	msgJoint.header.stamp 				= tnow;
 	msgJoint_desired.header.stamp 		= tnow;
 	msgJoint_current.header.stamp 		= tnow;	
 	for(int i=0; i<DOF_JOINTS; i++)
@@ -290,7 +288,7 @@ void timerCallback(const ros::TimerEvent& event)
 	}
 	
 	/*
-	// Use this to view relevant data
+	// Use this temrinal command to view relevant data
 	rxplot /allegroHand/joint_desired_states/position[5],/allegroHand/joint_current_states/position[5] /allegroHand/joint_desired_states/velocity[5],/allegroHand/joint_current_states/velocity[5] /allegroHand/joint_current_states/effort[5]
 	*/
 	
@@ -357,7 +355,8 @@ int main(int argc, char** argv)
 	
 	// Get Allegro Hand information from parameter server
 	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
-	string robot_name, whichHand, manufacturer, origin, serial, version;
+	string robot_name, whichHand, manufacturer, origin, serial;
+	double version;
 	ros::param::get("~hand_info/robot_name",robot_name);
 	ros::param::get("~hand_info/which_hand",whichHand);
 	ros::param::get("~hand_info/manufacturer",manufacturer);
@@ -409,7 +408,7 @@ int main(int argc, char** argv)
 	usleep(3000);
 	
 	// Dump Allegro Hand information to the terminal	
-	cout << endl << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
 
 	// Start ROS time
 	tstart = ros::Time::now();
