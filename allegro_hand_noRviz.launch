@@ -23,12 +23,12 @@
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> <!-- for Fuerte --> 
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy --> 
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> --> <!-- for Fuerte -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy -->    
     
     
     
-    <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen">
+    <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
 		<rosparam file="parameters/zero.yaml" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />

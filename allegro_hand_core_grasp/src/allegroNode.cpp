@@ -31,17 +31,26 @@
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define LIB_CMD_TOPIC "/allegroHand/lib_cmd"
 
-double current_position[DOF_JOINTS];
-double previous_position[DOF_JOINTS];
-double current_velocity[DOF_JOINTS];
-double desired_position[DOF_JOINTS];
-double desired_torque[DOF_JOINTS];
+
+double desired_position[DOF_JOINTS] 			= {0.0};
+double current_position[DOF_JOINTS] 			= {0.0};
+double previous_position[DOF_JOINTS] 			= {0.0};
+double current_position_filtered[DOF_JOINTS] 	= {0.0};
+double previous_position_filtered[DOF_JOINTS]	= {0.0};
+
+double current_velocity[DOF_JOINTS] 			= {0.0};
+double previous_velocity[DOF_JOINTS] 			= {0.0};
+double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
+
+double desired_torque[DOF_JOINTS] 				= {0.0};
+
 std::string  lib_cmd;
+
 
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",   "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0" };
 										  
 int frame = 0;
 
@@ -153,14 +162,32 @@ void timerCallback(const ros::TimerEvent& event)
 	dt = 1e-9*(tnow - tstart).nsec;
 	tstart = tnow;
 		
-	// save last joint position for velocity calc
-	for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
+	// save last iteration info
+	for(int i=0; i<DOF_JOINTS; i++)
+	{
+		previous_position[i] = current_position[i];
+		previous_position_filtered[i] = current_position_filtered[i];
+		previous_velocity[i] = current_velocity[i];
+	}
 		
 	//// CAN Communication
 	canDevice->setTorque(desired_torque);
 	lEmergencyStop = canDevice->update();
 	canDevice->getJointInfo(current_position);
 	//// end CAN Communication
+	
+	
+	
+	/*  ================================= 
+	=       LOWPASS FILTERING       =   
+	================================= */
+	for(int i=0; i<DOF_JOINTS; i++)    
+	{
+		current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
+		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
+	}	
+	
 				
 	if( lEmergencyStop < 0 )
 	{
@@ -211,8 +238,8 @@ void timerCallback(const ros::TimerEvent& event)
 			
 			// current position, velocity and effort (torque) published
 			msgJoint.header.stamp 									= tnow;
-			for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
-			for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
+			for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position_filtered[i];
+			for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity_filtered[i];
 			for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
 			joint_state_pub.publish(msgJoint);
 		}

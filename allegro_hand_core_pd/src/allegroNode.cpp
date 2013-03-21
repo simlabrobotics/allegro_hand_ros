@@ -50,35 +50,43 @@ double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
 double desired_position[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
-double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // default P gains
-										600.0,  600.0,  600.0, 1000.0,
+double k_p[DOF_JOINTS] 				= { 600.0,  600.0,  600.0, 1000.0,  // Default P Gains for PD Controller
+										600.0,  600.0,  600.0, 1000.0,	// These gains are loaded if the 'gains_pd.yaml' file is not loaded
 										600.0,  600.0,  600.0, 1000.0,
 									   1000.0, 1000.0, 1000.0,  600.0 };
 
-double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // default D gains
-										 15.0,   20.0,   15.0,   15.0,
+double k_d[DOF_JOINTS] 				= {  15.0,   20.0,   15.0,   15.0,  // Default D Gains for PD Controller
+										 15.0,   20.0,   15.0,   15.0,	// These gains are loaded if the 'gains_pd.yaml' file is not loaded
 										 15.0,   20.0,   15.0,   15.0,
 										 30.0,   20.0,   20.0,   15.0 };
+		
 									
-double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // default (home) position
-										  0.0,  -10.0,   45.0,   45.0,
-										  5.0,   -5.0,   50.0,   45.0,
+double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  // Default (HOME) position (degrees)
+										  0.0,  -10.0,   45.0,   45.0,	// This position is loaded and set upon system start
+										  5.0,   -5.0,   50.0,   45.0,	// if no 'initial_position.yaml' parameter is loaded.
 					   				     60.0,   25.0,   15.0,   45.0 };
 
-std::string pGainParams[DOF_JOINTS] = {	"/gains/p/j00", "/gains/p/j01", "/gains/p/j02", "/gains/p/j03", 
-										"/gains/p/j10", "/gains/p/j11", "/gains/p/j12", "/gains/p/j13",
-										"/gains/p/j20", "/gains/p/j21", "/gains/p/j22", "/gains/p/j23", 
-										"/gains/p/j30", "/gains/p/j31", "/gains/p/j32", "/gains/p/j33", };
 
-std::string dGainParams[DOF_JOINTS] = {	"/gains/d/j00", "/gains/d/j01", "/gains/d/j02", "/gains/d/j03", 
-										"/gains/d/j10", "/gains/d/j11", "/gains/d/j12", "/gains/d/j13",
-										"/gains/d/j20", "/gains/d/j21", "/gains/d/j22", "/gains/d/j23", 
-										"/gains/d/j30", "/gains/d/j31", "/gains/d/j32", "/gains/d/j33", };
+std::string pGainParams[DOF_JOINTS] = {	"/gains_pd/p/j00", "/gains_pd/p/j01", "/gains_pd/p/j02", "/gains_pd/p/j03", 
+										"/gains_pd/p/j10", "/gains_pd/p/j11", "/gains_pd/p/j12", "/gains_pd/p/j13",
+										"/gains_pd/p/j20", "/gains_pd/p/j21", "/gains_pd/p/j22", "/gains_pd/p/j23", 
+										"/gains_pd/p/j30", "/gains_pd/p/j31", "/gains_pd/p/j32", "/gains_pd/p/j33"};
+
+std::string dGainParams[DOF_JOINTS] = {	"/gains_pd/d/j00", "/gains_pd/d/j01", "/gains_pd/d/j02", "/gains_pd/d/j03", 
+										"/gains_pd/d/j10", "/gains_pd/d/j11", "/gains_pd/d/j12", "/gains_pd/d/j13",
+										"/gains_pd/d/j20", "/gains_pd/d/j21", "/gains_pd/d/j22", "/gains_pd/d/j23", 
+										"/gains_pd/d/j30", "/gains_pd/d/j31", "/gains_pd/d/j32", "/gains_pd/d/j33"};
+										
+std::string initialPosition[DOF_JOINTS] = {	"/initial_position/j00", "/initial_position/j01", "/initial_position/j02", "/initial_position/j03", 
+							 				"/initial_position/j10", "/initial_position/j11", "/initial_position/j12", "/initial_position/j13",
+											"/initial_position/j20", "/initial_position/j21", "/initial_position/j22", "/initial_position/j23", 
+											"/initial_position/j30", "/initial_position/j31", "/initial_position/j32", "/initial_position/j33"};										
+
 
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",    "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0" };
 
 
 int frame = 0;
@@ -141,8 +149,7 @@ void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 
 
 
-// In case of the Allegro Hand, this callback is processed
-// every 0.003 seconds
+// In case of the Allegro Hand, this callback is processed every 0.003 seconds
 void timerCallback(const ros::TimerEvent& event)
 {
 
@@ -186,8 +193,6 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =       LOWPASS FILTERING       =   
     ================================= */
-    //double alpha = 0.6;
-    //double beta = 0.198;	
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
     	current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
@@ -200,7 +205,7 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =        POSITION CONTROL       =   
     ================================= */
-    if(frame>20) // give the low pass filters 20 iterations to build up good data.
+    if(frame>100) // give the low pass filters 100 iterations (0.03s) to build up good data.
     {	
 		for(int i=0; i<DOF_JOINTS; i++)    
 		{
@@ -214,8 +219,8 @@ void timerCallback(const ros::TimerEvent& event)
 	msgJoint.header.stamp 		= tnow;	
 	for(int i=0; i<DOF_JOINTS; i++)
 	{
-		msgJoint.position[i] 	= current_position[i];
-		msgJoint.velocity[i] 	= current_velocity[i];
+		msgJoint.position[i] 	= current_position_filtered[i];
+		msgJoint.velocity[i] 	= current_velocity_filtered[i];
 		msgJoint.effort[i] 		= desired_torque[i];
 	}
 	joint_state_pub.publish(msgJoint);
@@ -266,7 +271,8 @@ int main(int argc, char** argv)
 	
 	// Get Allegro Hand information from parameter server
 	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
-	string robot_name, whichHand, manufacturer, origin, serial, version;
+	string robot_name, whichHand, manufacturer, origin, serial;
+	double version;
 	ros::param::get("~hand_info/robot_name",robot_name);
 	ros::param::get("~hand_info/which_hand",whichHand);
 	ros::param::get("~hand_info/manufacturer",manufacturer);
@@ -275,38 +281,37 @@ int main(int argc, char** argv)
 	ros::param::get("~hand_info/version",version);
 
 
-	// set gains via gains.yaml or to defaul values
-	if (ros::param::has("~gains"))
+	// set gains_pd via gains_pd.yaml or to defaul values
+	if (ros::param::has("~gains_pd"))
 	{
-		ROS_INFO("CTRL: PD gains loaded from param server.");
+		ROS_INFO("\n\nCTRL: PD gains loaded from param server.\n");
 		for(int i=0; i<DOF_JOINTS; i++)
 		{
 			ros::param::get(pGainParams[i], k_p[i]);
 			ros::param::get(dGainParams[i], k_d[i]);
-			printf("%f ", k_p[i]);
+			//printf("%f ", k_p[i]);
 		}
-		printf("\n");
+		//printf("\n");
 	}
 	else
 	{
 		// gains will be loaded every control iteration
-		ROS_WARN("CTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains.yaml\nLoading default PD gains...");
+		ROS_WARN("\n\nCTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains_pd.yaml\nloading default PD gains...\n");
 	}
 
 
 	// set initial position via initial_position.yaml or to defaul values
 	if (ros::param::has("~initial_position"))
 	{
-		ROS_INFO("CTRL: Initial Pose loaded from param server.");
-		
-/*  ================================= 
-    =    TODO LOAD VALUES HERE      =   
-    ================================= */
-    
+		ROS_INFO("\n\nCTRL: Initial Pose loaded from param server.\n");
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			ros::param::get(initialPosition[i], desired_position[i]);
+		}
 	}
 	else
 	{
-		ROS_WARN("Initial postion not loaded.\nCheck launch file is loading /parameters/initialPose.yaml\nLoading Home position instead...");
+		ROS_WARN("\n\nCTRL: Initial postion not loaded.\nCheck launch file is loading /parameters/initial_position.yaml\nloading Home position instead...\n");
 		// Home position
 		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);										
 	}
@@ -318,7 +323,7 @@ int main(int argc, char** argv)
 	usleep(3000);
 	
 	// Dump Allegro Hand information to the terminal	
-	cout << endl << endl << robot_name << " " << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
 
 	// Start ROS time
 	tstart = ros::Time::now();

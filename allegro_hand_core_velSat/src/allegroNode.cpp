@@ -47,62 +47,71 @@
 #define JOINT_CURRENT_TOPIC "/allegroHand/joint_current_states"
 
 
+double desired_position[DOF_JOINTS]				= {0.0};
 double current_position[DOF_JOINTS] 			= {0.0};
 double previous_position[DOF_JOINTS]			= {0.0};
-
 double current_position_filtered[DOF_JOINTS] 	= {0.0};
 double previous_position_filtered[DOF_JOINTS]	= {0.0};
 
+double desired_velocity[DOF_JOINTS]				= {0.0};
 double current_velocity[DOF_JOINTS] 			= {0.0};
 double previous_velocity[DOF_JOINTS] 			= {0.0};
 double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
 
-double desired_position[DOF_JOINTS]				= {0.0};
-double desired_velocity[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
 
 double v[DOF_JOINTS] 							= {0.0};	
 
 
-
-
-double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1200.0,  // default P gains
-										1200.0,  1200.0,  1200.0, 1200.0,
+double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1200.0,	// Default P Gains for Velocity Saturation Controller
+										1200.0,  1200.0,  1200.0, 1200.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
 										1200.0,  1200.0,  1200.0, 1200.0,
 									    1200.0,  1200.0,  1200.0, 1200.0 };
 
-double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   140.0,  // default D gains
-										 140.0,   140.0,   140.0,   140.0,
+double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   140.0,	// Default D Gains for Velocity Saturation Controller
+										 140.0,   140.0,   140.0,   140.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
 										 140.0,   140.0,   140.0,   140.0,
 										 140.0,   140.0,   140.0,   140.0 };
 
 			 
-double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, 	// velocity limits 
-										  	 10.0,   10.0,   10.0,   10.0, 	// with a max of 10, 6 is achieved
-										  	 10.0,   10.0,   10.0,   10.0, 
-										     10.0,   10.0,   10.0,   10.0 };	
+double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, 	// Velocity limits 
+										  	 10.0,   10.0,   10.0,   10.0, 	// With a max of 10rad/s, 6rad/s is achieved
+										  	 10.0,   10.0,   10.0,   10.0,	// within the ~90 degree range of each finger joint.
+										     10.0,   10.0,   10.0,   10.0 };// These values are loaded if the 'gains_velSat.yaml' file is not loaded.	
 										  	 									  	 									 
 
-double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  	// default (home) position (degrees)
-										  0.0,  -10.0,   45.0,   45.0,
-										  5.0,   -5.0,   50.0,   45.0,
+double home_pose[DOF_JOINTS]		= {   0.0,  -10.0,   45.0,   45.0,  	// Default (HOME) position (degrees)
+										  0.0,  -10.0,   45.0,   45.0,		// This position is loaded and set upon system start
+										  5.0,   -5.0,   50.0,   45.0,		// if no 'initial_position.yaml' parameter is loaded.
 					   				     60.0,   25.0,   15.0,   45.0 };
 
-std::string pGainParams[DOF_JOINTS] = {	"/gains/p/j00", "/gains/p/j01", "/gains/p/j02", "/gains/p/j03", 
-										"/gains/p/j10", "/gains/p/j11", "/gains/p/j12", "/gains/p/j13",
-										"/gains/p/j20", "/gains/p/j21", "/gains/p/j22", "/gains/p/j23", 
-										"/gains/p/j30", "/gains/p/j31", "/gains/p/j32", "/gains/p/j33", };
 
-std::string dGainParams[DOF_JOINTS] = {	"/gains/d/j00", "/gains/d/j01", "/gains/d/j02", "/gains/d/j03", 
-										"/gains/d/j10", "/gains/d/j11", "/gains/d/j12", "/gains/d/j13",
-										"/gains/d/j20", "/gains/d/j21", "/gains/d/j22", "/gains/d/j23", 
-										"/gains/d/j30", "/gains/d/j31", "/gains/d/j32", "/gains/d/j33", };
+std::string pGainParams[DOF_JOINTS] = {	"/gains_velSat/p/j00", "/gains_velSat/p/j01", "/gains_velSat/p/j02", "/gains_velSat/p/j03", 
+										"/gains_velSat/p/j10", "/gains_velSat/p/j11", "/gains_velSat/p/j12", "/gains_velSat/p/j13",
+										"/gains_velSat/p/j20", "/gains_velSat/p/j21", "/gains_velSat/p/j22", "/gains_velSat/p/j23", 
+										"/gains_velSat/p/j30", "/gains_velSat/p/j31", "/gains_velSat/p/j32", "/gains_velSat/p/j33"};
+
+std::string dGainParams[DOF_JOINTS] = {	"/gains_velSat/d/j00", "/gains_velSat/d/j01", "/gains_velSat/d/j02", "/gains_velSat/d/j03", 
+										"/gains_velSat/d/j10", "/gains_velSat/d/j11", "/gains_velSat/d/j12", "/gains_velSat/d/j13",
+										"/gains_velSat/d/j20", "/gains_velSat/d/j21", "/gains_velSat/d/j22", "/gains_velSat/d/j23", 
+										"/gains_velSat/d/j30", "/gains_velSat/d/j31", "/gains_velSat/d/j32", "/gains_velSat/d/j33"};
+										
+std::string vMaxParams[DOF_JOINTS] = {	"/gains_velSat/v_max/j00", "/gains_velSat/v_max/j01", "/gains_velSat/v_max/j02", "/gains_velSat/v_max/j03", 
+										"/gains_velSat/v_max/j10", "/gains_velSat/v_max/j11", "/gains_velSat/v_max/j12", "/gains_velSat/v_max/j13",
+										"/gains_velSat/v_max/j20", "/gains_velSat/v_max/j21", "/gains_velSat/v_max/j22", "/gains_velSat/v_max/j23", 
+										"/gains_velSat/v_max/j30", "/gains_velSat/v_max/j31", "/gains_velSat/v_max/j32", "/gains_velSat/v_max/j33"};										
+										
+std::string initialPosition[DOF_JOINTS] = {	"/initial_position/j00", "/initial_position/j01", "/initial_position/j02", "/initial_position/j03", 
+							 				"/initial_position/j10", "/initial_position/j11", "/initial_position/j12", "/initial_position/j13",
+											"/initial_position/j20", "/initial_position/j21", "/initial_position/j22", "/initial_position/j23", 
+											"/initial_position/j30", "/initial_position/j31", "/initial_position/j32", "/initial_position/j33"};												
+
 
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",   "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0" };
 
 
 
@@ -128,10 +137,6 @@ std::string  ext_cmd;
 // ROS Time
 ros::Time tstart;
 ros::Time tnow;
-
-ros::Time canStart;
-ros::Time canEnd;
-double canTime;
 
 double secs;
 double dt;
@@ -188,9 +193,10 @@ void timerCallback(const ros::TimerEvent& event)
 	
 	//dt = 0.003;
 	
-	//if ((1/dt)>400)
+	//if ((1/dt)>400){
 	//printf("%f\n",(1/dt-333.33333));
 	//printf("%f\n",(dt));
+	//}
 		
 	// save last iteration info
 	for(int i=0; i<DOF_JOINTS; i++)
@@ -204,12 +210,10 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =       CAN COMMUNICATION       = 
     ================================= */	
-     canStart = ros::Time::now();	
 	canDevice->setTorque(desired_torque);		// WRITE joint torque
 	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
 	canDevice->getJointInfo(current_position);	// READ current joint positions
-	 canEnd = ros::Time::now();	
-	 canTime = 1e-9*(canEnd - canStart).nsec;
+
 
 		
 		
@@ -226,13 +230,9 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =       LOWPASS FILTERING       =   
     ================================= */
-    //double alpha = 0.6;
-    //double beta = 0.198;	
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
     	current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
-    	
-    	//current_position_filtered[i] = current_position[i];
 		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
 		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
 	}
@@ -247,7 +247,7 @@ void timerCallback(const ros::TimerEvent& event)
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
 		desired_velocity[i] = (k_p[i]/k_d[i])*(desired_position[i] - current_position_filtered[i]);
-		v[i] = std::min( 1.0, v_max[i]/fabs(desired_velocity[i]) ); // absolute value for floats
+		v[i] = std::min( 1.0, v_max[i]/fabs(desired_velocity[i]) ); 	// absolute value for floats
 	} 		
 	
 	
@@ -255,13 +255,11 @@ void timerCallback(const ros::TimerEvent& event)
 /*  ================================= 
     =        POSITION CONTROL       =   
     ================================= */
-    if(frame>20) // give the low pass filters 20 iterations to build up good data.
+    if(frame>100) // give the low pass filters 100 iterations (0.03s) to build up good data.
     {	
 		for(int i=0; i<DOF_JOINTS; i++)    
 		{
-			//desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
 			desired_torque[i] = -k_d[i]*( current_velocity_filtered[i] - v[i]*desired_velocity[i] );
-			//desired_torque[i] = desired_torque[i]/800.0;
 			desired_torque[i] = desired_torque[i]/800.0;
 		}
 	}		
@@ -274,17 +272,17 @@ void timerCallback(const ros::TimerEvent& event)
 	msgJoint_current.header.stamp 		= tnow;	
 	for(int i=0; i<DOF_JOINTS; i++)
 	{
-		msgJoint.position[i] 	= current_position_filtered[i];
-		msgJoint.velocity[i] 	= current_velocity_filtered[i];
-		msgJoint.effort[i] 		= desired_torque[i];
+		msgJoint.position[i] 			= current_position_filtered[i];
+		msgJoint.velocity[i] 			= current_velocity_filtered[i];
+		msgJoint.effort[i] 				= desired_torque[i];
 		
-		msgJoint_desired.position[i] = desired_position[i];
-		msgJoint_desired.velocity[i] = desired_velocity[i]*v[i];
-		msgJoint_desired.effort[i] = desired_torque[i];
+		msgJoint_desired.position[i] 	= desired_position[i];
+		msgJoint_desired.velocity[i] 	= desired_velocity[i]*v[i];
+		msgJoint_desired.effort[i] 		= desired_torque[i];
 		
-		msgJoint_current.position[i] = current_position_filtered[i];
-		msgJoint_current.velocity[i] = current_velocity_filtered[i];
-		msgJoint_current.effort[i] = desired_torque[i]; //v_max[i]/fabs(desired_velocity[i]);// 0.0;	// just for plotting, not current torque
+		msgJoint_current.position[i] 	= current_position_filtered[i];
+		msgJoint_current.velocity[i] 	= current_velocity_filtered[i];
+		msgJoint_current.effort[i] 		= desired_torque[i]; 	// Just for plotting. Not actually current torque,
 	}
 	
 	/*
@@ -365,38 +363,38 @@ int main(int argc, char** argv)
 	ros::param::get("~hand_info/version",version);
 
 
-	// set gains via gains.yaml or to defaul values
-	if (ros::param::has("~gains"))
+	// set gains via gains_velSat.yaml or to defaul values
+	if (ros::param::has("~gains_velSat"))
 	{
-		ROS_INFO("CTRL: PD gains loaded from param server.");
+		ROS_INFO("CTRL: Velocity Saturation gains loaded from param server.");
 		for(int i=0; i<DOF_JOINTS; i++)
 		{
 			ros::param::get(pGainParams[i], k_p[i]);
 			ros::param::get(dGainParams[i], k_d[i]);
-			printf("%f ", k_p[i]);
+			ros::param::get(vMaxParams[i],  v_max[i]);
+			//printf("%f ", k_p[i]);
 		}
-		printf("\n");
+		//printf("\n");
 	}
 	else
 	{
 		// gains will be loaded every control iteration
-		ROS_WARN("CTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains.yaml\nLoading default PD gains...");
+		ROS_WARN("CTRL: Velocity Satuartion gains not loaded.\nCheck launch file is loading /parameters/gains_velSat.yaml\nLoading default Vel. Sat. gains...");
 	}
 
 
 	// set initial position via initial_position.yaml or to defaul values
 	if (ros::param::has("~initial_position"))
 	{
-		ROS_INFO("CTRL: Initial Pose loaded from param server.");
-		
-/*  ================================= 
-    =    TODO: LOAD VALUES HERE     =   
-    ================================= */
-    
+		ROS_INFO("\n\nCTRL: Initial Pose loaded from param server.\n");
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			ros::param::get(initialPosition[i], desired_position[i]);
+		}
 	}
 	else
 	{
-		ROS_WARN("Initial postion not loaded.\nCheck launch file is loading /parameters/initialPose.yaml\nLoading Home position instead...");
+		ROS_WARN("\n\nCTRL: Initial postion not loaded.\nCheck launch file is loading /parameters/initial_position.yaml\nloading Home position instead...\n");
 		// Home position
 		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);										
 	}

@@ -1,53 +1,49 @@
 <launch>
 
-<!--=================================================================== -->
-<!-- HOW TO LAUNCH ALL CONTROLLERS USING THIS ONE LAUNCH FILE ???-->
-<!-- THERE SHOULD ONLY BE TWO -->
-<!--=================================================================== -->
-
 	<!-- 
 	Controllers include:
 	
 		'grasp'
 		'grasp_slp'
 		'pd'
+		'pd_slp'
 		'velSat'
-		'template' 
+		'template'
+		'template_slp' 
 		
 	The default controller is 'grasp' which emplys the included grasping library.	
 	-->
 	<arg name="CONTROLLER" default="grasp"/>	
 	
-	
-	<!-- instead of reading this from the terminal, maybe instead it can read it from the parameter server? But then how would you isolate the hands? -->
-	
 	<!-- Default hand is the right hand -->
-	<arg name="WHICHHAND" default="right"/>	
+	<arg name="HAND" default="right"/>	
+	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 
 
-	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg WHICHHAND).urdf"/>
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> <!-- for Fuerte --> 
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy --> 
     
+  
     
-    
-    <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen">
+    <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
 		<rosparam file="parameters/zero.yaml" command="load" />
+		<rosparam file="parameters/gains_pd.yaml" command="load" />
+		<rosparam file="parameters/gains_velSat.yaml" command="load" />
+		<!--<rosparam file="parameters/initial_position.yaml" command="load" />-->
 	</node>
 
 	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
 	
-	<!--=================================================================== -->
-	<!-- CHECK THAT THIS IS WORKING FOR ALL INCLUDED CONTROLLERS -->
-	<!-- MAY HAVE TO ADD SOME PUBLISHERS TO THE OTHER CONTROLLERS -->
-	<!--=================================================================== -->	
+	<!--
 	<node pkg="rxtools" type="rxplot" name="plot_speed" 
 	args="/allegroHand/joint_desired_states/position[9],/allegroHand/joint_current_states/position[9]
 	/allegroHand/joint_desired_states/velocity[9],/allegroHand/joint_current_states/velocity[9]
 	/allegroHand/joint_current_states/effort[9]" />
-      
+	-->
+	
 </launch>

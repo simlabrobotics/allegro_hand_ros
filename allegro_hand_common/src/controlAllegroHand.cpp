@@ -28,11 +28,12 @@ controlAllegroHand::controlAllegroHand()
 
 	if (ros::param::has("~zero"))
 	{
-		mEmergencyStop = false;		
+		mEmergencyStop = false;	
+		ROS_INFO("\n\nCAN: Joint zeros and directions loaded from parameter server.\n");	
 	}
 	else
 	{
-		ROS_ERROR("Encoder/Motor offsets and directions not loaded.\nCheck launch file is loading /parameters/zero.yaml\nShutting down...");
+		ROS_ERROR("\n\nEncoder/Motor offsets and directions not loaded.\nCheck launch file is loading /parameters/zero.yaml\nShutting down...\n");
 		mEmergencyStop = true;
 	}
 	

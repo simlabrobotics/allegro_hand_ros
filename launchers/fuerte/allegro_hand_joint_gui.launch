@@ -17,18 +17,12 @@
 	
 	<!-- Default hand is the right hand -->
 	<arg name="HAND" default="right"/>	
-	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
-
-
-	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
-        <remap from="joint_states" to="/allegroHand/joint_states"/>
-    </node>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> <!-- for Fuerte --> 
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy --> 
-    
+	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>	
     
     
     <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen">
+    	<remap from="/allegroHand/joint_cmd" to="joint_states"/>
+    	
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
 		<rosparam file="parameters/zero.yaml" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />
@@ -36,6 +30,11 @@
 		<rosparam file="parameters/initial_position.yaml" command="load" />
 	</node>
 
+	
+	<node name="joint_gui" pkg="joint_state_publisher_experimental" type="joint_state_publisher" ></node>
+	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> <!-- for Fuerte --> 
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy -->     
 	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
 	

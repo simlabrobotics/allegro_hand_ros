@@ -40,16 +40,28 @@
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define EXT_CMD_TOPIC "/allegroHand/external_cmd"
 
-double current_position[DOF_JOINTS]	= {0};
-double previous_position[DOF_JOINTS]= {0};
-double current_velocity[DOF_JOINTS]	= {0};
-double desired_position[DOF_JOINTS]	= {0};
-double desired_torque[DOF_JOINTS]	= {0};
+#define JOINT_DESIRED_TOPIC "/allegroHand/joint_desired_states"
+#define JOINT_CURRENT_TOPIC "/allegroHand/joint_current_states"
+
+
+double desired_position[DOF_JOINTS]				= {0.0};
+double current_position[DOF_JOINTS] 			= {0.0};
+double previous_position[DOF_JOINTS]			= {0.0};
+double current_position_filtered[DOF_JOINTS] 	= {0.0};
+double previous_position_filtered[DOF_JOINTS]	= {0.0};
+
+double desired_velocity[DOF_JOINTS]				= {0.0};
+double current_velocity[DOF_JOINTS] 			= {0.0};
+double previous_velocity[DOF_JOINTS] 			= {0.0};
+double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
+
+double desired_torque[DOF_JOINTS] 				= {0.0};
+
 
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",    "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0" };
 
 int frame = 0;
 
@@ -107,8 +119,7 @@ void extCmdCallback(const std_msgs::String::ConstPtr& msg)
 }
 
 
-// In case of the Allegro Hand, this callback is processed
-// every 0.003 seconds
+// In case of the Allegro Hand, this callback is processed every 0.003 seconds
 void timerCallback(const ros::TimerEvent& event)
 {
 	// Calculate loop time;
@@ -140,23 +151,41 @@ void timerCallback(const ros::TimerEvent& event)
 	}
 
 
+/*  ================================= 
+	=       LOWPASS FILTERING       =   
+	================================= */
+	for(int i=0; i<DOF_JOINTS; i++)    
+	{
+		current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
+		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
+	}	
+
+
+
+
+
+    if(frame>100) // give the low pass filters 100 iterations (0.03s) to build up good data.
+	{
 
 /*  ================================= 
-    =  COMPUTE CONTROL TORQUE HERE  =   
-    ================================= */	
+	=  COMPUTE CONTROL TORQUE HERE  =   
+	================================= */	
+
+	}
 
 
-		
+
+
+
 	// PUBLISH current position, velocity and effort (torque)
-	msgJoint.header.stamp 									= tnow;
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
-	
-	for(int i=0; i<DOF_JOINTS; i++) current_velocity[i] 	= (current_position[i] - previous_position[i])/dt;
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
-	
-	for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
-	
+	msgJoint.header.stamp 		= tnow;	
+	for(int i=0; i<DOF_JOINTS; i++)
+	{
+		msgJoint.position[i] 	= current_position_filtered[i];
+		msgJoint.velocity[i] 	= current_velocity_filtered[i];
+		msgJoint.effort[i] 		= desired_torque[i];
+	}
 	joint_state_pub.publish(msgJoint);
 		
 		
@@ -221,7 +250,7 @@ int main(int argc, char** argv)
 	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
 
 	// Initialize torque at zero
-	//for(int i=0; i<16; i++) desired_torque[i] = 0.0;
+	for(int i=0; i<16; i++) desired_torque[i] = 0.0;
 
 	// Start ROS time
 	tstart = ros::Time::now();

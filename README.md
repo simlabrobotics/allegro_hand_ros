@@ -1,6 +1,9 @@
 allegro_hand_ros
 ================
 
+roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right
+
+
 ROS stack for SimLab's Allegro Hand
 
 This ROS Stack includes code and tools useful

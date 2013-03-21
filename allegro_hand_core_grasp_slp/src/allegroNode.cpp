@@ -31,17 +31,29 @@
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define LIB_CMD_TOPIC "/allegroHand/lib_cmd"
 
-double current_position[DOF_JOINTS];
-double previous_position[DOF_JOINTS];
-double current_velocity[DOF_JOINTS];
-double desired_position[DOF_JOINTS];
-double desired_torque[DOF_JOINTS];
+
+
+
+
+double desired_position[DOF_JOINTS] 			= {0.0};
+double current_position[DOF_JOINTS] 			= {0.0};
+double previous_position[DOF_JOINTS] 			= {0.0};
+double current_position_filtered[DOF_JOINTS] 	= {0.0};
+double previous_position_filtered[DOF_JOINTS]	= {0.0};
+
+double current_velocity[DOF_JOINTS] 			= {0.0};
+double previous_velocity[DOF_JOINTS] 			= {0.0};
+double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
+
+double desired_torque[DOF_JOINTS] 				= {0.0};
+
 std::string  lib_cmd;
+
 
 std::string jointNames[DOF_JOINTS] 	= {    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 										   "joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 									  	   "joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
-										   "joint_12.0",   "joint_13.0",  "joint_14.0",  "joint_15.0" };
+										   "joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0" };
 
 int frame = 0;
 
@@ -65,12 +77,10 @@ ros::Time tnow;
 double secs;
 double dt;
 
-// Initialize BHand 
+// Initialize BHand
 eMotionType gMotionType = eMotionType_NONE ;
-// Uncomment one of the following according to which hand you are using
-// Need to make this an option externally w/o recompiling
-  BHand lBHand(eHandType_Left);
-//BHand lBHand(eHandType_Right);
+BHand lBHand(eHandType_Right);
+
 
 
 // Initialize CAN device		
@@ -153,6 +163,7 @@ eMotionType_PRE_SHAPE,			//
 
 int main(int argc, char** argv)
 {
+	using namespace std;
 
 	ros::init(argc, argv, "allegro_hand_core_grasp");
 	ros::Time::init();
@@ -178,13 +189,38 @@ int main(int argc, char** argv)
 	// Joint names (for use with joint_state_publisher GUI - matches URDF)
 	for(int i=0; i<DOF_JOINTS; i++)	msgJoint.name[i] = jointNames[i];	
 
+	
+	// Get Allegro Hand information from parameter server
+	// This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package	
+	string robot_name, whichHand, manufacturer, origin, serial;
+	double version;
+	ros::param::get("~hand_info/robot_name",robot_name);
+	ros::param::get("~hand_info/which_hand",whichHand);
+	ros::param::get("~hand_info/manufacturer",manufacturer);
+	ros::param::get("~hand_info/origin",origin);
+	ros::param::get("~hand_info/serial",serial);
+	ros::param::get("~hand_info/version",version);
+
 	// Initialize BHand controller
+	if (whichHand.compare("left") == 0)
+	{
+		BHand lBHand(eHandType_Left);
+		ROS_INFO("CTRL: Left Allegro Hand controller initialized.");
+	}
+	else
+	{
+		ROS_INFO("CTRL: Right Allegro Hand controller initialized.");
+	}
 	lBHand.SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	// Initialize CAN device
 	canDevice = new controlAllegroHand();
 	canDevice->init();
 	usleep(3000);
+	
+	// Dump Allegro Hand information to the terminal	
+	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	
 
 	// Initialize torque at zero
 	for(int i=0; i<16; i++) desired_torque[i] = 0.0;
@@ -205,14 +241,31 @@ int main(int argc, char** argv)
 		dt = 1e-9*(tnow - tstart).nsec;
 		tstart = tnow;
 
-		// save last joint position for velocity calc
-		for(int i=0; i<DOF_JOINTS; i++) previous_position[i] = current_position[i];
+		// save last iteration info
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			previous_position[i] = current_position[i];
+			previous_position_filtered[i] = current_position_filtered[i];
+			previous_velocity[i] = current_velocity[i];
+		}
 
 		//// CAN Communication
 		canDevice->setTorque(desired_torque);
 		lEmergencyStop = canDevice->update();
         canDevice->getJointInfo(current_position);
 		//// end CAN Communication
+		
+		
+	/*  ================================= 
+		=       LOWPASS FILTERING       =   
+		================================= */
+		for(int i=0; i<DOF_JOINTS; i++)    
+		{
+			current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+			current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
+			current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
+		}			
+
 
 		if( lEmergencyStop < 0 )
 		{
@@ -262,8 +315,8 @@ int main(int argc, char** argv)
 
 				// current position, velocity and effort (torque) published
 				msgJoint.header.stamp 									= tnow;
-				for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position[i];
-				for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity[i];
+				for(int i=0; i<DOF_JOINTS; i++) msgJoint.position[i] 	= current_position_filtered[i];
+				for(int i=0; i<DOF_JOINTS; i++) msgJoint.velocity[i] 	= current_velocity_filtered[i];
 				for(int i=0; i<DOF_JOINTS; i++) msgJoint.effort[i] 		= desired_torque[i];
 				joint_state_pub.publish(msgJoint);
 			}
