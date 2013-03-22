@@ -44,6 +44,7 @@ Launchers
   allegro_hand_joint_gui_virtual.launch: Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   
   Note: All four (4) of the launch files have three arguments that can be specified
+  
     CONTROLLER:=
       grasp (default)
       grasp_slp
