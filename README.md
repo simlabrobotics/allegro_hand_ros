@@ -28,11 +28,11 @@ allegro_hand_description:
 allegro_hand_keyboard
   Contains code for the keyboard node used to command different grasps. Only usefulwhen running the allegro_hand_core_grasp or allegro_hand_core_grasp_slp controllers.
   
-parameters:
-  gains_pd.yaml: Contains PD gains used in allegro_hand_core_pd and allegro_hand_core_pd_slp.
-  gains_velSat.yaml: Contains PD gains and velocity limits used in allegro_hand_core_velSat
-  initial_position.yaml: Contains the initial position for the joints to got to when joint space controllers like *pd, *pd_slp and *velSat are used. By default, this is the Allegro Hand Home position.
-  zero.yaml: Offsets and directions for each of the 16 joints. Read in by the CAN communication code. Also includes Allegro Hand info specific to each hand like version number and serial number.
+<h1>parameters:</h1>
+*gains_pd.yaml: Contains PD gains used in allegro_hand_core_pd and allegro_hand_core_pd_slp.
+*gains_velSat.yaml: Contains PD gains and velocity limits used in allegro_hand_core_velSat
+*initial_position.yaml: Contains the initial position for the joints to got to when joint space controllers like *pd, *pd_slp and *velSat are used. By default, this is the Allegro Hand Home position.
+*zero.yaml: Offsets and directions for each of the 16 joints. Read in by the CAN communication code. Also includes Allegro Hand info specific to each hand like version number and serial number.
   
   Note: If any of the gains files or the initial positions file are missing, the three jpint space controllers (*pd, *pd_slp and *velSat) will load default values sepcified in the srespective allegroNode.cpp file. If zero.yaml is not loaded, the Allegro Hand will shut down automatically.
   
