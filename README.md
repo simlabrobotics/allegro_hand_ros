@@ -1,7 +1,9 @@
 allegro_hand_ros
 ================
 
-roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right
+++ RUNNING THE ALLEGRO HAND ++
+Defaults:
+roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
 
 
 ROS stack for SimLab's Allegro Hand

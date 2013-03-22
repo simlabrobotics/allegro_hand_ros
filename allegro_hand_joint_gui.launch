@@ -20,6 +20,9 @@
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>	
 	<arg name="gui" default="True" />
 	<param name="use_gui" value="$(arg gui)"/>
+	
+	<!-- This launch file is set up for ROS FUERTE by default. If you are using GROOVY, please set this param to 'true'.-->
+	<arg name="GROOVY" default="false"/>
     
     
     <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
@@ -35,8 +38,11 @@
 	
 	<node name="joint_gui" pkg="joint_state_publisher_experimental" type="joint_state_publisher" ></node>
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher"/>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> <!-- for Fuerte --> 
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy -->     
+  
+    <!-- for Fuerte -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
+    <!-- for Groovy -->  
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/>    
 	
 	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
 	

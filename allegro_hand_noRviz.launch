@@ -18,13 +18,19 @@
 	<!-- Default hand is the right hand -->
 	<arg name="HAND" default="right"/>	
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
+	
+	<!-- This launch file is set up for ROS FUERTE by default. If you are using GROOVY, please set this param to 'true'.-->
+	<arg name="GROOVY" default="false"/>	
 
 
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" /> --> <!-- for Fuerte -->
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" /> --> <!-- for Groovy -->    
+
+    <!-- for Fuerte -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
+    <!-- for Groovy -->  
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/> 
     
     
     
