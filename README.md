@@ -1,45 +1,89 @@
-allegro_hand_ros
-================
-
-RUNNING THE ALLEGRO HAND
-=========================
-
-Defaults:
-roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
-
+allegro_hand_ros beta2
+======================
 
 ROS stack for SimLab's Allegro Hand
 
 This ROS Stack includes code and tools useful
 to users of SimLab Co., Ltd.'s Allegro Hand.
 
-Package Descriptions:
-=========================
-
-*AllegroHand [deprecated]
- - Currently contains an application that executes both CAN communication and Allegro Hand grasping library motions and grasps. This is currently being split into two seperate nodes: CAN communication & Grasping library communication
 
 
-++ COMMUNICATION ++
+Contents
+========
+allegro_hand_common:
+  Contains files common to multiple Allegro Hand controllers like CAN communication code and SimLab/KITECH's Allegro Hand Grasping Library.
 
-AllegroHand_CAN
- - This is the CAN communication layer for any Allegro Hand controller. This node publishes current joint positions (radians) and subscribes to joint torque commands (N*m). Any controller designed for the hand should input and output these position and torque values, respectively.
- - Both messages are of type sensor_msgs/JointState.
+allegro_hand_controllers:
+  Contains example controllers like: 
+    PD Joint Space control
+    Velocity Saturation Joint Space Control
+    Grasping Library Interface
+  This folder also contains templates for easily testing your own control code.
+  
+  Note: The PD and Grasp controllers, along with the controller templates, include two control loop timing methods each. One method uses a timer interrupt while the other uses a sleep function to eat up remaining control loop time. Please research the benefits and downfalls of each of these on ROS.org.
+  
+allegro_hand_description:
+  Contains the robot description URDF for the Allegro Hand. Currently only the right hand is complete.
+      
+allegro_hand_keyboard
+  Contains code for the keyboard node used to command different grasps. Only usefulwhen running the allegro_hand_core_grasp or allegro_hand_core_grasp_slp controllers.
+  
+parameters:
+  gains_pd.yaml: Contains PD gains used in allegro_hand_core_pd and allegro_hand_core_pd_slp.
+  gains_velSat.yaml: Contains PD gains and velocity limits used in allegro_hand_core_velSat
+  initial_position.yaml: Contains the initial position for the joints to got to when joint space controllers like *pd, *pd_slp and *velSat are used. By default, this is the Allegro Hand Home position.
+  zero.yaml: Offsets and directions for each of the 16 joints. Read in by the CAN communication code. Also includes Allegro Hand info specific to each hand like version number and serial number.
+  
+  Note: If any of the gains files or the initial positions file are missing, the three jpint space controllers (*pd, *pd_slp and *velSat) will load default values sepcified in the srespective allegroNode.cpp file. If zero.yaml is not loaded, the Allegro Hand will shut down automatically.
+  
+Launchers
+=========
+  allegro_hand.launch: Launches Allegro Hand with specified controller. Also launches keyboard controller and rviz visualizer.
+  allegro_hand_noRviz.launch: Launches Allegro Hand with specified controller. Also launches keyboard controller and DOES NOT launch rviz visualizer.  
+  allegro_hand_joint_gui.launch: Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
+  allegro_hand_joint_gui_virtual.launch: Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
+  
+  Note: All four (4) of the launch files have three arguments that can be specified
+    CONTROLLER:=
+      grasp (default)
+      grasp_slp
+      pd
+      pd_slp
+      velSat
+      template
+      template_slp
+      
+    HAND:=
+      right (default)
+      left
+      
+    GROOVY
+      false (default, used for ROS Fuerte)
+      true  
+    
+  To launch the default grasp controller for the right Allegro Hand using Fuerte:
+    roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
+    -or simply-
+    roslaunch allegro_hand.launch
+  
+  For the PD controller on a right hand using Groovy:
+    roslaunch allegro_hand.launch CONTROLLER:=pd GROOVY:=true
+    
+    
+Thanks
+======    
+Please be advised, this is the first beta release of the ROS stack for SimLab's Allegro Hand platform. There will likely be bugs and there is much room for improvement. 
+
+Please share you improvements to the code included in this release. Also, we would love to include the interesting controllers you may create as part of the package. Please keep an open line of contact as we continue to develop this software.
+
+Thanks.
+
+Alex Alspach <alexalspach@simlab.co.kr>
 
 
-++ CONTROLLERS ++	
 
-AllegroHand_ctrl_graspLib
- - Interfaces with the Allegro Hand grasping library making available many torque controlled grasping modes such as finger tip grasps and full hand grasping. Also available it joint PD position control.
-  - Includes a keyboard input handler for executing each grasp. grasps and PD control can also be executed by publishing to the std_msgs/String and sensor_msgs/JointState messages respectively.
-	
 
-++ TOOLS ++
-
-AllegroHand_urdf
- - This package includes a kinematic model of the Allegro Hand. This model can be used to confirm the validity of joint positions commands before executing such commands on the Allegro Hand hardware.
- - Included launch files will also launch Allegro Hand control and communication nodes with output to put the the actual and virtual Allegro Hands.
  
 Note:
- Control loops utilizing both timer callbacks and ROS' Rate object are included. Generally, the timer callback is more reliable as it will run the control code in a new thread if the previous iteration fails to end within the given crol period. The rate object, aling with a spinOnce() and a sleep, generally does a fine job but some anomolies have been recognized where the loop toaks much too long and remains blocked until finishing. Using the rate/sleep method allows for simpler code.
+ As stated above, control loops utilizing both timer callbacks and ROS' Rate object are included. Generally, the timer callback is more reliable as it will run the control code in a new thread if the previous iteration fails to end within the given crol period. The rate object, aling with a spinOnce() and a sleep, generally does a fine job but some anomolies have been recognized where the loop toaks much too long and remains blocked until finishing. Using the rate/sleep method allows for simpler code.
  
