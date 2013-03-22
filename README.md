@@ -1,7 +1,9 @@
 allegro_hand_ros
 ================
 
-++ RUNNING THE ALLEGRO HAND ++
+RUNNING THE ALLEGRO HAND
+=========================
+
 Defaults:
 roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
 
