@@ -28,7 +28,7 @@ allegro_hand_description:
 allegro_hand_keyboard
   Contains code for the keyboard node used to command different grasps. Only usefulwhen running the allegro_hand_core_grasp or allegro_hand_core_grasp_slp controllers.
   
-<h1>parameters:</h1>
+parameters:
 *gains_pd.yaml: Contains PD gains used in allegro_hand_core_pd and allegro_hand_core_pd_slp.
 *gains_velSat.yaml: Contains PD gains and velocity limits used in allegro_hand_core_velSat
 *initial_position.yaml: Contains the initial position for the joints to got to when joint space controllers like *pd, *pd_slp and *velSat are used. By default, this is the Allegro Hand Home position.
