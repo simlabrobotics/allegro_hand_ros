@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AllegroHand_Left">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="allegro_hand_left">
 
 <xacro:property name="DEG2RAD" value="0.01745329251" />
 

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AllegroHand_Left">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="allegro_hand_right">
 
 <!--
 rosrun xacro xacro.py allegro_hand_description_right.urdf.xacro > allegro_hand_description_right.urdf
@@ -206,8 +206,7 @@ and one fixed link will be added for the tip. -->
   
   <joint name="joint_${finger_num*4+0}" type="revolute">
     <axis xyz="-1 0 0"/>
-    <!--<limit effort="0" velocity="0" lower="${limit_0_t_low-joint_safety_margin}" upper="${limit_0_t_up-joint_safety_margin}" />-->
-    <limit effort="0" velocity="0" lower="-1" upper="1" />
+    <limit effort="0" velocity="0" lower="${limit_0_t_low-joint_safety_margin}" upper="${limit_0_t_up-joint_safety_margin}" />
     <parent link="base_link"/>
     <child link="link_${finger_num*4+0}"/>
     <origin rpy="${finger_angle_r} ${finger_angle_p} ${finger_angle_y}" xyz="${offset_origin_x} ${offset_origin_y} ${offset_origin_z}"/>
