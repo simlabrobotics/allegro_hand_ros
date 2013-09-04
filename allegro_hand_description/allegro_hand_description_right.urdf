@@ -392,7 +392,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <!--<box size="${link0_t_x} ${link0_t_y} ${link0_t_z}"/>-->
-        <mesh filename="package://allegro_hand_description/meshes/link_12.0_right.STL"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_12.0_left.STL"/>
       </geometry>
       <!--<origin rpy="0 0 0" xyz="${-0.0358/2+0.027} ${0.034/2-0.026} ${0.045/2-0.008}"/>-->
       <material name="black">

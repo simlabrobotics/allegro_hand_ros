@@ -19,7 +19,7 @@
 the radius of the finger tip sphere will be subtracted
 and one fixed link will be added for the tip. -->
 <xacro:property name="link3_z" value="0.0387" /> 
-<xacro:property name="fingerTip_r" value="0.0120" />
+<xacro:property name="fingerTip_r" value="0.0150" />
 
 
 <!-- ========================= THUMB PARAMS ========================= -->
@@ -63,28 +63,14 @@ and one fixed link will be added for the tip. -->
   <link name="base_link">
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/base_link_left.STL" />
-      	<!--     drawing  estimate  estimate  -->
-        <!--<box size="0.0408 0.1130 ${base_link_z}"/> -->
-      </geometry>
-      <!--<origin rpy="0 0 0" xyz="-0.009300 0 -${base_link_z/2}"/>-->
-      <origin rpy="${-90*DEG2RAD} 0 0" xyz="0 0 0"/>
-      <material name="black">
-        <color rgba="0.2 0.2 0.2 1"/>
-      </material>
-    </visual>
-    
-    <collision>
-      <geometry>
       	<!--     drawing  estimate  estimate  -->
         <box size="0.0408 0.1130 ${base_link_z}"/>
       </geometry>
-		<origin rpy="0 0 0" xyz="-0.009300 0 -${base_link_z/2}"/>
-		      <material name="black">
-        <color rgba="0.2 0.2 0.2 1"/>
+      <origin rpy="0 0 0" xyz="-0.009300 0 -${base_link_z/2}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
       </material>
-    </collision>
-    
+    </visual>
   </link>
 
 <!-- ============================================================================= -->
@@ -185,8 +171,7 @@ and one fixed link will be added for the tip. -->
         <box size="${links_x} ${links_y} ${link1_t_z}"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 ${link1_t_z/2}"/>
-      <material name="black">
-        <color rgba="0 0 .8 1"/>
+      <material name="blue">
       </material>
     </visual>   
   </link>
@@ -230,7 +215,7 @@ and one fixed link will be added for the tip. -->
         <box size="${links_x} ${links_y} ${link3_t_z-fingerTip_r}"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 ${(link3_t_z-fingerTip_r)/2}"/>
-      <material name="black">
+      <material name="blue">
       </material>
     </visual>   
   </link>
@@ -305,20 +290,13 @@ and one fixed link will be added for the tip. -->
 	<link name="link_${finger_num*4+0}">	
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/link_0.0.STL" />
-        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
-      </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
-      <material name="black"/>
-    </visual> 
-    
-    <collision>
-      <geometry>
         <box size="${links_x} ${links_y} ${link0_z}"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>
-    </collision>   
-          
+      <material name="black">
+        <color rgba=".2 .2 .2 1"/>
+      </material>
+    </visual>   
   </link>
   
   <joint name="joint_${finger_num*4+0}" type="revolute">
@@ -335,20 +313,12 @@ and one fixed link will be added for the tip. -->
 	<link name="link_${finger_num*4+1}">	
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/link_1.0.STL" />
-        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
-      </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
-      <material name="black"/>
-    </visual>   
-    
-    <collision>
-      <geometry>
         <box size="${links_x} ${links_y} ${link1_z}"/>
       </geometry>
-	  <origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>
-    </collision>  
-        
+      <origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>
+      <material name="blue">
+      </material>
+    </visual>   
   </link>
   
   <joint name="joint_${finger_num*4+1}" type="revolute">
@@ -365,20 +335,12 @@ and one fixed link will be added for the tip. -->
 	<link name="link_${finger_num*4+2}">	
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/link_2.0.STL" />
-        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
-      </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
-      <material name="black"/>
-    </visual>  
-    
-    <collision>
-      <geometry>
         <box size="${links_x} ${links_y} ${link2_z}"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>     
-    </collision>   
-         
+      <origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>
+      <material name="black">
+      </material>
+    </visual>   
   </link>
   
   <joint name="joint_${finger_num*4+2}" type="revolute">
@@ -396,20 +358,12 @@ and one fixed link will be added for the tip. -->
 	<link name="link_${finger_num*4+3}">	
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/link_3.0.STL" />
-        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
-      </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
-      <material name="black"/>
-    </visual>   
-    
-    <collision>
-      <geometry>
         <box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>
-    </collision>   
-    
+      <material name="blue">
+      </material>
+    </visual>   
   </link>
   
   <joint name="joint_${finger_num*4+3}" type="revolute">
@@ -425,33 +379,23 @@ and one fixed link will be added for the tip. -->
 	<link name="link_${finger_num*4+3}_tip">	
     <visual>
       <geometry>
-      	<mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL" />
-        <!--<sphere radius="${fingerTip_r}"/>-->
+        <sphere radius="${fingerTip_r}"/>
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
+      <origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
-    </visual>  
-    
-     <collision>
-      <geometry>
-      	<sphere radius="${fingerTip_r}"/>
-      </geometry>
-    </collision>     
-    
-     
+    </visual>   
   </link>
   
   <joint name="joint_${finger_num*4+3}_tip" type="fixed">
     <parent link="link_${finger_num*4+3}"/>
     <child link="link_${finger_num*4+3}_tip"/>
-    <origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>
+    <origin xyz="0 0 0"/>
   </joint>   
   
 </xacro:macro>
 <!-- [[END]] THREE FINGER MACRO -->
-
     
 </robot>
 

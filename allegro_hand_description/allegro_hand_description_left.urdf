@@ -18,14 +18,26 @@ and one fixed link will be added for the tip. -->
   <link name="base_link">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/base_link_left.STL"/>
+        <!--     drawing  estimate  estimate  -->
+        <!--<box size="0.0408 0.1130 ${base_link_z}"/> -->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="-0.009300 0 -${base_link_z/2}"/>-->
+      <origin rpy="-1.5707963259 0 0" xyz="0 0 0"/>
+      <material name="black">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
         <!--     drawing  estimate  estimate  -->
         <box size="0.0408 0.1130 0.095"/>
       </geometry>
       <origin rpy="0 0 0" xyz="-0.009300 0 -0.0475"/>
-      <material name="blue">
-        <color rgba="0 0 .8 1"/>
+      <material name="black">
+        <color rgba="0.2 0.2 0.2 1"/>
       </material>
-    </visual>
+    </collision>
   </link>
   <!-- ============================================================================= -->
   <!-- FINGERS -->
@@ -34,13 +46,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_0.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0082"/>
-      <material name="black">
-        <color rgba=".2 .2 .2 1"/>
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_0.0" type="revolute">
     <axis xyz="0 0 1"/>
@@ -52,12 +69,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_1.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.027"/>
-      <material name="blue">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_1.0" type="revolute">
     <limit effort="0" lower="-0.196" upper="1.61" velocity="0"/>
@@ -69,12 +92,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_2.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0192"/>
-      <material name="black">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_2.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -86,12 +115,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_3.0">
     <visual>
       <geometry>
-        <box size="0.0196 0.0275 0.0237"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.01185"/>
-      <material name="blue">
-      </material>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
+      <material name="black"/>
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.0196 0.0275 0.0267"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.01335"/>
+    </collision>
   </link>
   <joint name="joint_3.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -103,29 +138,40 @@ and one fixed link will be added for the tip. -->
   <link name="link_3.0_tip">
     <visual>
       <geometry>
-        <sphere radius="0.015"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
+        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.0237"/>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.012"/>
+      </geometry>
+    </collision>
   </link>
   <joint name="joint_3.0_tip" type="fixed">
     <parent link="link_3.0"/>
     <child link="link_3.0_tip"/>
-    <origin xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
   <link name="link_4.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0082"/>
-      <material name="black">
-        <color rgba=".2 .2 .2 1"/>
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_4.0" type="revolute">
     <axis xyz="0 0 1"/>
@@ -137,12 +183,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_5.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.027"/>
-      <material name="blue">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_5.0" type="revolute">
     <limit effort="0" lower="-0.196" upper="1.61" velocity="0"/>
@@ -154,12 +206,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_6.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0192"/>
-      <material name="black">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_6.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -171,12 +229,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_7.0">
     <visual>
       <geometry>
-        <box size="0.0196 0.0275 0.0237"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.01185"/>
-      <material name="blue">
-      </material>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
+      <material name="black"/>
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.0196 0.0275 0.0267"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.01335"/>
+    </collision>
   </link>
   <joint name="joint_7.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -188,29 +252,40 @@ and one fixed link will be added for the tip. -->
   <link name="link_7.0_tip">
     <visual>
       <geometry>
-        <sphere radius="0.015"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
+        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.0237"/>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.012"/>
+      </geometry>
+    </collision>
   </link>
   <joint name="joint_7.0_tip" type="fixed">
     <parent link="link_7.0"/>
     <child link="link_7.0_tip"/>
-    <origin xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
   <link name="link_8.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0082"/>
-      <material name="black">
-        <color rgba=".2 .2 .2 1"/>
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_8.0" type="revolute">
     <axis xyz="0 0 1"/>
@@ -222,12 +297,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_9.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.027"/>
-      <material name="blue">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_9.0" type="revolute">
     <limit effort="0" lower="-0.196" upper="1.61" velocity="0"/>
@@ -239,12 +320,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_10.0">
     <visual>
       <geometry>
+        <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
+      </geometry>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0192"/>
-      <material name="black">
-      </material>
-    </visual>
+    </collision>
   </link>
   <joint name="joint_10.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -256,12 +343,18 @@ and one fixed link will be added for the tip. -->
   <link name="link_11.0">
     <visual>
       <geometry>
-        <box size="0.0196 0.0275 0.0237"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
+        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.01185"/>
-      <material name="blue">
-      </material>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
+      <material name="black"/>
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.0196 0.0275 0.0267"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.01335"/>
+    </collision>
   </link>
   <joint name="joint_11.0" type="revolute">
     <axis xyz="0 1 0"/>
@@ -273,18 +366,24 @@ and one fixed link will be added for the tip. -->
   <link name="link_11.0_tip">
     <visual>
       <geometry>
-        <sphere radius="0.015"/>
+        <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
+        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.0237"/>
+      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.012"/>
+      </geometry>
+    </collision>
   </link>
   <joint name="joint_11.0_tip" type="fixed">
     <parent link="link_11.0"/>
     <child link="link_11.0_tip"/>
-    <origin xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
   <link name="link_12.0">
     <visual>
@@ -310,7 +409,8 @@ and one fixed link will be added for the tip. -->
         <box size="0.0196 0.0275 0.0177"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.00885"/>
-      <material name="blue">
+      <material name="black">
+        <color rgba="0 0 .8 1"/>
       </material>
     </visual>
   </link>
@@ -341,10 +441,10 @@ and one fixed link will be added for the tip. -->
   <link name="link_15.0">
     <visual>
       <geometry>
-        <box size="0.0196 0.0275 0.0393"/>
+        <box size="0.0196 0.0275 0.0423"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.01965"/>
-      <material name="blue">
+      <origin rpy="0 0 0" xyz="0 0 0.02115"/>
+      <material name="black">
       </material>
     </visual>
   </link>
@@ -358,9 +458,9 @@ and one fixed link will be added for the tip. -->
   <link name="link_15.0_tip">
     <visual>
       <geometry>
-        <sphere radius="0.015"/>
+        <sphere radius="0.012"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.0393"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0423"/>
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
