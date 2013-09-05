@@ -13,6 +13,9 @@ roslaunch launchers/fuerte/allegro_hand_jgui_right_virtual.launch
   <!-- full height from joint to tip. when used,
 the radius of the finger tip sphere will be subtracted
 and one fixed link will be added for the tip. -->
+  <!--0.0435,   0.044981-->
+  <!--0.002298-->
+  <!--0.002298-->
   <!-- ========================= THUMB PARAMS ========================= -->
   <!-- ========================= LIMITS ========================= -->
   <!-- ============================================================================= -->
@@ -23,36 +26,31 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/base_link.STL"/>
-        <!--     drawing  estimate  estimate  -->
-        <!--<box size="0.0408 0.1130 ${base_link_z}"/> -->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="-0.009300 0 -${base_link_z/2}"/>-->
+      <!-- LEFT -->
+      <!-- <origin rpy="${-90*DEG2RAD} 0 0" xyz="0 0 0 "/> -->
+      <!-- RIGHT -->
+      <origin rpy="0 0 0" xyz="0 0 0 "/>
       <material name="black">
         <color rgba="0.2 0.2 0.2 1"/>
       </material>
     </visual>
     <collision>
+      <origin rpy="0 0 0" xyz="-0.009300 0 -0.0475"/>
       <geometry>
-        <!--     drawing  estimate  estimate  -->
         <box size="0.0408 0.1130 0.095"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="-0.009300 0 -0.0475"/>
     </collision>
   </link>
   <!-- ============================================================================= -->
   <!-- FINGERS -->
-  <!--0.0435,   0.044981-->
-  <!--0.002298-->
-  <!--0.002298-->
   <!-- RIGHT HAND due to which finger is number 0 -->
   <!-- for LEFT HAND switch the sign of the **offset_origin_y** and **finger_angle_r** parameters-->
   <link name="link_0.0">
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -73,9 +71,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -96,9 +92,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -119,9 +113,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -142,9 +134,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
-        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
@@ -164,9 +154,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -187,9 +175,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -210,9 +196,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -233,9 +217,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -256,9 +238,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
-        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
@@ -278,9 +258,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_0.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link0_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link0_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -301,9 +279,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_1.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link1_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -324,9 +300,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_2.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link2_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_z/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -347,9 +321,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link3_z-fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_z-fingerTip_r)/2}"/>-->
       <material name="black"/>
     </visual>
     <collision>
@@ -370,9 +342,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_3.0_tip.STL"/>
-        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
@@ -388,13 +358,15 @@ and one fixed link will be added for the tip. -->
     <child link="link_11.0_tip"/>
     <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
+  <!-- THUMB -->
   <link name="link_12.0">
     <visual>
       <geometry>
-        <!--<box size="${link0_t_x} ${link0_t_y} ${link0_t_z}"/>-->
-        <mesh filename="package://allegro_hand_description/meshes/link_12.0_left.STL"/>
+        <!-- RIGHT -->
+        <mesh filename="package://allegro_hand_description/meshes/link_12.0_right.STL"/>
+        <!-- LEFT -->
+        <!-- <mesh filename="package://allegro_hand_description/meshes/link_12.0_left.STL" /> -->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="${-0.0358/2+0.027} ${0.034/2-0.026} ${0.045/2-0.008}"/>-->
       <material name="black">
         <color rgba=".2 .2 .2 1"/>
       </material>
@@ -403,7 +375,10 @@ and one fixed link will be added for the tip. -->
       <geometry>
         <box size="0.0358 0.034 0.0455"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.0091 -0.009 0.0145"/>
+      <!-- RIGHT -->
+      <origin rpy="0 0 0" xyz="-0.0179 0.009 0.0145"/>
+      <!-- LEFT -->
+      <!-- <origin rpy="0 0 0" xyz="${-0.0358/2+0.0} ${-.018/2} ${.029/2}"/> -->
     </collision>
   </link>
   <joint name="joint_12.0" type="revolute">
@@ -416,11 +391,10 @@ and one fixed link will be added for the tip. -->
   <link name="link_13.0">
     <visual>
       <geometry>
-        <!--<box size="${links_x} ${links_y} ${link1_t_z}"/>-->
         <mesh filename="package://allegro_hand_description/meshes/link_13.0.STL"/>
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link1_t_z/2}"/>-->
       <material name="black">
+        <color rgba=".2 .2 .2 1"/>
       </material>
     </visual>
     <collision>
@@ -435,18 +409,18 @@ and one fixed link will be added for the tip. -->
     <limit effort="0" lower="-0.105" upper="1.163" velocity="0"/>
     <parent link="link_12.0"/>
     <child link="link_13.0"/>
-    <!--<origin xyz="0 0 ${0.0552-0.0177}"/>-->
+    <!-- RIGHT -->
     <origin xyz="-0.027 0.005 0.0399"/>
+    <!-- LEFT -->
+    <!-- <origin xyz="-0.027 -0.005 0.0399"/> -->
   </joint>
   <link name="link_14.0">
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_14.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link2_t_z}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link2_t_z/2}"/>-->
       <material name="black">
-      </material>
+		  	</material>
     </visual>
     <collision>
       <geometry>
@@ -466,11 +440,9 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_15.0.STL"/>
-        <!--<box size="${links_x} ${links_y} ${link3_t_z-fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${(link3_t_z-fingerTip_r)/2}"/>-->
       <material name="black">
-      </material>
+    	</material>
     </visual>
     <collision>
       <geometry>
@@ -490,9 +462,7 @@ and one fixed link will be added for the tip. -->
     <visual>
       <geometry>
         <mesh filename="package://allegro_hand_description/meshes/link_15.0_tip.STL"/>
-        <!--<sphere radius="${fingerTip_r}"/>-->
       </geometry>
-      <!--<origin rpy="0 0 0" xyz="0 0 ${link3_t_z-fingerTip_r}"/>-->
       <material name="white">
         <color rgba=".9 .9 .9 1"/>
       </material>
@@ -510,43 +480,24 @@ and one fixed link will be added for the tip. -->
     <origin rpy="0 0 0" xyz="0 0 0.0423"/>
     <!--0.0267000000000005-->
   </joint>
-  <!-- offset_origin_z=	"-0.07308" 
-	
-	
-		finger_num=			"3" 
-	offset_origin_x=	"-0.0182"	
-	offset_origin_y=	"0.019333" 
-	offset_origin_z=	"-0.044987"
-	
-	-->
-  <!-- THE STL ORIGIN NEEDS TO BE FIXED. ALSO THESE NUMBERS NEED TO BE DERIVEDFROM DRAWING, NOT SOLIDOWRKS EXP URDF, see the drawing on the wiki -->
   <!--
-<xacro:thumb_left
+<xacro:thumb_left 
 	finger_num=			"3" 
 	offset_origin_x=	"-0.0182"	
-	offset_origin_y=	"-0.0168753" 
-	offset_origin_z=	"-0.07308" 
+	offset_origin_y=	"-0.019333" 
+	offset_origin_z=	"-0.045987" 
 	
 	
-	finger_angle_r=		"0"
+	finger_angle_r=		"${90*DEG2RAD}"
 	finger_angle_p=		"-${95*DEG2RAD}"	
 	finger_angle_y=		"${90*DEG2RAD}"
 />
 -->
-  <!-- -${95*DEG2RAD}    ${180*DEG2RAD} -->
-  <!-- ============================================================================= -->
-  <!-- LEFT -->
-  <!-- THUMB -->
-  <!-- Write code for left and right with proper changes
-	(using variables for like comps) and include as 2 macros
-	include both and comment unused for right and left -->
-  <!-- END LEFT -->
   <!-- ============================================================================= -->
   <!-- ============================================================================= -->
   <!-- ============================================================================= -->
-  <!-- THUMB MACROS -->
-  <!-- NOT USING CORRECT MESHES -->
-  <!-- [[END]] THUMB MACRO -->
+  <!-- THUMB MACRO -->
+  <!-- END THUMB MACRO -->
   <!-- THREE FINGER MACRO -->
   <!-- [[END]] THREE FINGER MACRO -->
 </robot>

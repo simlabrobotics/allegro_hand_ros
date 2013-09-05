@@ -23,8 +23,8 @@ then
 	HAND="LEFT"
 	hand="left"
 else
- echo "\n\nWrong or incorrect amount of arguments.\nUse 'bash build_desc.sh -h' for instructions.\n\n"
- echo "If you see an error like\n'[: 7: right: unexpected operator',\nuse 'bash build_desc.sh' instead of 'sh build_desc.sh'.\n\n"
+ echo -e "\n\nWrong or incorrect amount of arguments.\nUse 'bash build_desc.sh -h' for instructions.\n\n"
+ echo -e "If you see an error like\n'[: 7: right: unexpected operator',\nuse 'bash build_desc.sh' instead of 'sh build_desc.sh'.\n\n"
  exit 0
 fi
 
