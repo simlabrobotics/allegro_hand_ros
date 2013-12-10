@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="allegro_hand_left">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="allegro_hand_right">
 
 <!--
 rosrun xacro xacro.py allegro_hand_description_right.urdf.xacro > allegro_hand_description_right.urdf
@@ -75,13 +75,13 @@ and one fixed link will be added for the tip. -->
 	
 	<visual>
     	<geometry>
-      		<mesh filename="package://allegro_hand_description/meshes/base_link_left.STL" />
+      		<mesh filename="package://allegro_hand_description/meshes/base_link.STL" />
       	</geometry>
       
       	<!-- LEFT -->
-      	<origin rpy="${-90*DEG2RAD} 0 0" xyz="0 0 0 "/>
+      	<!-- <origin rpy="${-90*DEG2RAD} 0 0" xyz="0 0 0 "/> -->
       	<!-- RIGHT -->
-      	<!--<origin rpy="0 0 0" xyz="0 0 0 "/>-->
+      	<origin rpy="0 0 0" xyz="0 0 0 "/>
       
       	<material name="black">
         	<color rgba="0.2 0.2 0.2 1"/>
@@ -105,7 +105,7 @@ and one fixed link will be added for the tip. -->
 <!-- RIGHT HAND due to which finger is number 0 -->
 <!-- for LEFT HAND switch the sign of the **offset_origin_y** and **finger_angle_r** parameters-->
 <xacro:finger 
-	finger_num=			"2"
+	finger_num=			"0"
 	offset_origin_x=	"${offset_origin_x_const}"	
 	offset_origin_y=	"${offset_origin_y_const}"
 	offset_origin_z=	"${offset_origin_z_const}"
@@ -121,7 +121,7 @@ and one fixed link will be added for the tip. -->
 />
 
 <xacro:finger 
-	finger_num=			"0" 
+	finger_num=			"2" 
 	offset_origin_x=	"${offset_origin_x_const}"	
 	offset_origin_y=	"-${offset_origin_y_const}" 
 	offset_origin_z=	"${offset_origin_z_const}" 
@@ -131,7 +131,6 @@ and one fixed link will be added for the tip. -->
 
 <!-- THUMB -->
 
-<!--
 <xacro:thumb_right
 	finger_num=			"3" 
 	offset_origin_x=	"-0.0182"	
@@ -143,14 +142,8 @@ and one fixed link will be added for the tip. -->
 	finger_angle_p=		"-${95*DEG2RAD}"	
 	finger_angle_y=		"-${90*DEG2RAD}"
 />
--->
-	
-	
-	<!--
-	finger_angle_r=		"${90*DEG2RAD}"
-	finger_angle_p=		"-${100*DEG2RAD}"	
-	finger_angle_y=		"${0*DEG2RAD}"
-	-->
+
+<!--
 <xacro:thumb_left 
 	finger_num=			"3" 
 	offset_origin_x=	"-0.0182"	
@@ -158,12 +151,11 @@ and one fixed link will be added for the tip. -->
 	offset_origin_z=	"-0.045987" 
 	
 	
-
-	finger_angle_r=		"0"
+	finger_angle_r=		"${90*DEG2RAD}"
 	finger_angle_p=		"-${95*DEG2RAD}"	
 	finger_angle_y=		"${90*DEG2RAD}"
 />
-
+-->
 
 
 <!-- ============================================================================= -->
@@ -172,7 +164,7 @@ and one fixed link will be added for the tip. -->
 
 
 <!-- THUMB MACRO -->
-<xacro:macro name="thumb_left" params="finger_num offset_origin_x offset_origin_y offset_origin_z finger_angle_r finger_angle_p finger_angle_y">
+<xacro:macro name="thumb_right" params="finger_num offset_origin_x offset_origin_y offset_origin_z finger_angle_r finger_angle_p finger_angle_y">
 
 <!-- [LINK 12] -->
 	<link name="link_${finger_num*4+0}">	
@@ -180,14 +172,13 @@ and one fixed link will be added for the tip. -->
     	<visual>
 			<geometry>
         		<!-- RIGHT -->
-      			<!-- <mesh filename="package://allegro_hand_description/meshes/link_12.0_right.STL" /> -->
+      			<mesh filename="package://allegro_hand_description/meshes/link_12.0_right.STL" />
       			<!-- LEFT -->
-      			<mesh filename="package://allegro_hand_description/meshes/link_12.0_left.STL" />
+      			<!-- <mesh filename="package://allegro_hand_description/meshes/link_12.0_left.STL" /> -->
       		</geometry>
       		<material name="black">
         		<color rgba=".2 .2 .2 1"/>
       		</material>
-      		<origin rpy="${180*DEG2RAD} 0 0" xyz="0 0 0"/>
     	</visual>   
     
     	<collision>
@@ -196,16 +187,16 @@ and one fixed link will be added for the tip. -->
       		</geometry>
       		
   			<!-- RIGHT -->
-            <!-- <origin rpy="0 0 0" xyz="${-0.0358/2+0.0} ${.018/2} ${.029/2}"/> -->
+            <origin rpy="0 0 0" xyz="${-0.0358/2+0.0} ${.018/2} ${.029/2}"/>
      		<!-- LEFT -->
-     		<origin rpy="0 0 0" xyz="${-0.0358/2+0.0} ${-.018/2} ${.029/2}"/>
+     		<!-- <origin rpy="0 0 0" xyz="${-0.0358/2+0.0} ${-.018/2} ${.029/2}"/> -->
     	</collision>   
         
 	</link>
   
 	<joint name="joint_${finger_num*4+0}" type="revolute">
 	
-    	<axis xyz="+1 0 0"/>
+    	<axis xyz="-1 0 0"/>
     	<limit effort="0" velocity="0" lower="${limit_0_t_low-joint_safety_margin}" upper="${limit_0_t_up-joint_safety_margin}" />
     	<parent link="base_link"/>
     	<child link="link_${finger_num*4+0}"/>
@@ -237,15 +228,15 @@ and one fixed link will be added for the tip. -->
   
   	<joint name="joint_${finger_num*4+1}" type="revolute">
   	
-    	<axis xyz="0 0 -1"/>
+    	<axis xyz="0 0 1"/>
      	<limit effort="0" velocity="0" lower="${limit_1_t_low+joint_safety_margin}" upper="${limit_1_t_up-joint_safety_margin}" />
     	<parent link="link_${finger_num*4+0}"/>
     	<child link="link_${finger_num*4+1}"/>
 		
 		<!-- RIGHT -->    
-    	<!-- <origin xyz="-0.027 0.005 0.0399"/> -->
+    	<origin xyz="-0.027 0.005 0.0399"/>
     	<!-- LEFT -->
-    	<origin xyz="-0.027 -0.005 0.0399"/>
+    	<!-- <origin xyz="-0.027 -0.005 0.0399"/> -->
 
   	</joint>  
 
