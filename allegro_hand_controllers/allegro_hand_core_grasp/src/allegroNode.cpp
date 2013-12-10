@@ -75,11 +75,11 @@ double dt;
 
 // Initialize BHand 
 eMotionType gMotionType = eMotionType_NONE ;
-BHand lBHand(eHandType_Right);
-
+BHand* pBHand = NULL;
+//BHand lBHand(eHandType_Right);
 
 // Initialize CAN device		
-controlAllegroHand *canDevice;
+controlAllegroHand* canDevice;
 
 
 
@@ -93,7 +93,7 @@ void SetjointCallback(const sensor_msgs::JointState& msg)
 	for(int i=0;i<DOF_JOINTS;i++) desired_position[i] = msg.position[i];
 	mutex->unlock();
 	
-	lBHand.SetMotionType(eMotionType_JOINT_PD);
+	pBHand->SetMotionType(eMotionType_JOINT_PD);
 }
 
 void libCmdCallback(const std_msgs::String::ConstPtr& msg)
@@ -105,35 +105,35 @@ void libCmdCallback(const std_msgs::String::ConstPtr& msg)
 	// so that the controll loop has access to desired position.
 	if (lib_cmd.compare("pdControl") == 0)
 	{
-		lBHand.SetMotionType(eMotionType_JOINT_PD);
+		pBHand->SetMotionType(eMotionType_JOINT_PD);
 		pdControl = true;
 	}    
 	else
     	pdControl = false;  
 	
 	if (lib_cmd.compare("home") == 0) 
-		lBHand.SetMotionType(eMotionType_HOME);
+		pBHand->SetMotionType(eMotionType_HOME);
     
 	if (lib_cmd.compare("ready") == 0) 
-		lBHand.SetMotionType(eMotionType_READY);
+		pBHand->SetMotionType(eMotionType_READY);
 	
 	if (lib_cmd.compare("grasp_3") == 0) 
-		lBHand.SetMotionType(eMotionType_GRASP_3);
+		pBHand->SetMotionType(eMotionType_GRASP_3);
 	
 	if (lib_cmd.compare("grasp_4") == 0) 
-		lBHand.SetMotionType(eMotionType_GRASP_4);
+		pBHand->SetMotionType(eMotionType_GRASP_4);
     
 	if (lib_cmd.compare("pinch_it") == 0) 
-		lBHand.SetMotionType(eMotionType_PINCH_IT);
+		pBHand->SetMotionType(eMotionType_PINCH_IT);
 	
 	if (lib_cmd.compare("pinch_mt") == 0) 
-		lBHand.SetMotionType(eMotionType_PINCH_MT); 	 
+		pBHand->SetMotionType(eMotionType_PINCH_MT); 	 
 	
 	if (lib_cmd.compare("envelop") == 0) 
-		lBHand.SetMotionType(eMotionType_ENVELOP); 
+		pBHand->SetMotionType(eMotionType_ENVELOP); 
 	
 	if (lib_cmd.compare("off") == 0) 
-		lBHand.SetMotionType(eMotionType_NONE);
+		pBHand->SetMotionType(eMotionType_NONE);
 	
 	if (lib_cmd.compare("save") == 0) 
 		for(int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];
@@ -170,17 +170,18 @@ void timerCallback(const ros::TimerEvent& event)
 		previous_velocity[i] = current_velocity[i];
 	}
 		
-	//// CAN Communication
+	/* ================================== 
+	 =        CAN COMMUNICATION         =   
+	 ================================== */
 	canDevice->setTorque(desired_torque);
 	lEmergencyStop = canDevice->update();
 	canDevice->getJointInfo(current_position);
-	//// end CAN Communication
 	
 	
 	
-	/*  ================================= 
-	=       LOWPASS FILTERING       =   
-	================================= */
+	/* ================================== 
+	 =         LOWPASS FILTERING        =   
+	 ================================== */
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
 		current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
@@ -198,7 +199,7 @@ void timerCallback(const ros::TimerEvent& event)
 	}
 
 	// compute control torque using Bhand library
-	lBHand.SetJointPosition(current_position_filtered);
+	pBHand->SetJointPosition(current_position_filtered);
 	
 	// Run on FIRST iteration (sets PD control of intitial position)
 	if( lIsBegin == false ){
@@ -211,8 +212,8 @@ void timerCallback(const ros::TimerEvent& event)
 			}
 			
 			// Start joint position control (Bhand)
-			lBHand.SetMotionType(eMotionType_JOINT_PD);
-			lBHand.UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
+			pBHand->SetMotionType(eMotionType_JOINT_PD);
+			pBHand->UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
 			for(int i=0; i<DOF_JOINTS; i++) desired_torque[i] = 0.0;
 		}
 		else{			
@@ -224,13 +225,13 @@ void timerCallback(const ros::TimerEvent& event)
 			
 			// Desired position only necessary if in PD Control mode
 			if (pdControl==true)
-				lBHand.SetJointDesiredPosition(desired_position);
+				pBHand->SetJointDesiredPosition(desired_position);
 			
 			// BHand lib control updated with time stamp
-			lBHand.UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
+			pBHand->UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
 			
 			// Necessary torque obtained from Bhand lib
-			lBHand.GetJointTorque(desired_torque);
+			pBHand->GetJointTorque(desired_torque);
 			
 			// Calculate joint velocity
 			for(int i=0; i<DOF_JOINTS; i++)
@@ -298,14 +299,15 @@ int main(int argc, char** argv)
 	// Initialize BHand controller
 	if (whichHand.compare("left") == 0)
 	{
-		BHand lBHand(eHandType_Left);
-		ROS_INFO("CTRL: Left Allegro Hand controller initialized.");
+		pBHand = new BHand(eHandType_Left);
+		ROS_WARN("CTRL: Left Allegro Hand controller initialized.");
 	}
 	else
 	{
-		ROS_INFO("CTRL: Right Allegro Hand controller initialized.");
+		pBHand = new BHand(eHandType_Right);
+		ROS_WARN("CTRL: Right Allegro Hand controller initialized.");
 	}
-	lBHand.SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
+	pBHand->SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
 
 	// Initialize CAN device
 	canDevice = new controlAllegroHand();
@@ -331,6 +333,7 @@ int main(int argc, char** argv)
 	// Clean shutdown: shutdown node, shutdown can, be polite.
 	nh.shutdown();
 	delete canDevice;
+	delete pBHand;
 	//printf("\nBye.\n");
 	printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
 	return 0;

@@ -13,11 +13,18 @@
 		
 	The default controller is 'grasp' which emplys the included grasping library.	
 	-->
+	
 	<arg name="CONTROLLER" default="grasp"/>	
 	
-	<!-- Default hand is the right hand -->
-	<arg name="HAND" default="right"/>	
+	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the robot_description and for the grasping library controllers. -->
+	<!-- <arg name="HAND" default="right"/>	-->
+	<arg name="HAND"/> <!-- left, right -->
+	
+	<arg name="CAN_CH" default="/dev/pcan32"/>
+	<arg name="ZEROS" default="parameters/zero.yaml"/>		
+	
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>	
+	
 	<arg name="gui" default="True" />
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -29,10 +36,12 @@
     	<remap from="/allegroHand/joint_cmd" to="joint_states"/>
     	
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
-		<rosparam file="parameters/zero.yaml" command="load" />
+		<rosparam file="$(arg ZEROS)" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />
 		<rosparam file="parameters/gains_velSat.yaml" command="load" />
 		<rosparam file="parameters/initial_position.yaml" command="load" />
+		<param name="/comm/CAN_CH" value="$(arg CAN_CH)" />
+		<param name="/hand_info/which_hand" value="$(arg HAND)" /> <!-- See HAND arg above -->
 	</node>
 
 	
@@ -44,7 +53,7 @@
     <!-- for Groovy -->  
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/>    
 	
-	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
+	<!-- <node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node> -->
 	
 	<!--
 	<node pkg="rxtools" type="rxplot" name="plot_speed" 

@@ -38,7 +38,8 @@ Contents
  * **gains_pd.yaml:** Contains PD gains used in allegro_hand_core_pd and allegro_hand_core_pd_slp.
  * **gains_velSat.yaml:** Contains PD gains and velocity limits used in allegro_hand_core_velSat
  * **initial_position.yaml:** Contains the initial position for the joints to got to when joint space controllers like *pd*, *pd_slp* and *velSat* are used. By default, this is the Allegro Hand *Home position*.
- * **zero.yaml:** Offsets and directions for each of the 16 joints. Read in by the CAN communication code. Also includes Allegro Hand info specific to each hand like version number and serial number.
+ * **zero.yaml:** Offsets and directions for each of the 16 joints (Read in by the CAN communication code) Also includes Allegro Hand info specific to each hand like version number and serial number.
+ **Note:** The inclusion of "which_hand" (right/left) in this file has been deprecated. This must be specified as an argument when launching any of the allegro_hand* launchers.
   
   **Note:** If any of the gains files or the initial positions file are missing, the three jpint space controllers (*pd*, *pd_slp* and *velSat*) will load default values sepcified in the srespective allegroNode.cpp file. If zero.yaml is not loaded, the Allegro Hand will shut down automatically.
   
@@ -49,8 +50,20 @@ Launchers
   * **allegro_hand_joint_gui.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   * **allegro_hand_joint_gui_virtual.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   
-**Note:** All four (4) of the launch files have three arguments that can be specified
-  
+**Note:** All launch files (including virtual hand) have three arguments that can be specified:
+      
+  * **HAND:=**
+    * right
+    * left
+    * **Note:** There is no default. This arg must be specified.
+    
+      
+  * **GROOVY:=**
+    * false (default, used for ROS Fuerte)
+    * true  
+    
+**Note:** The following arguments can be specified for actual hardware launch file:
+
   * **CONTROLLER:=**
     * grasp (default)
     * grasp_slp
@@ -59,14 +72,15 @@ Launchers
     * velSat
     * template
     * template_slp
-      
-  * **HAND:=**
-    * right (default)
-    * left
-      
-  * **GROOVY:=**
-    * false (default, used for ROS Fuerte)
-    * true  
+    
+  * **ZEROS:=**
+    * zero.yaml (default)
+    * path to zero*.yaml file (ex. "parameters/zero_files/zero_SAH020CR020.yaml")
+    
+  * **CAN_CH:=**
+    * /dev/pcan32 (default)
+    * another PEAK CAN Channel (see in /dev/*)
+     
     
 
 <br>
@@ -80,12 +94,19 @@ roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
 roslaunch allegro_hand.launch
 ```  
  
- <br> 
+<br> 
 * For the PD controller on a right hand using Groovy:
 
 ```
 roslaunch allegro_hand.launch CONTROLLER:=pd GROOVY:=true
-```    
+```   
+
+<br> 
+* Using velocity saturation controller on a left, CAN Channel 1 and the offsets, etc. for Hand SAH020CR020:
+
+```
+roslaunch allegro_hand.launch CONTROLLER:=velSat HAND:=left CAN_CH:=1 ZEROS:=parameters/zero_files/zero_SAH020CR020.yaml
+```   
     
 Thanks
 ------    

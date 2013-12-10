@@ -13,10 +13,16 @@
 		
 	The default controller is 'grasp' which emplys the included grasping library.	
 	-->
+	
 	<arg name="CONTROLLER" default="grasp"/>	
 	
-	<!-- Default hand is the right hand -->
-	<arg name="HAND" default="right"/>	
+	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the robot_description and for the grasping library controllers. -->
+	<!-- <arg name="HAND" default="right"/>	-->
+	<arg name="HAND"/> <!-- left, right -->
+	
+	<arg name="CAN_CH" default="/dev/pcan32"/>
+	<arg name="ZEROS" default="parameters/zero.yaml"/>		
+	
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 	
 	<!-- This launch file is set up for ROS FUERTE by default. If you are using GROOVY, please set this param to 'true'.-->
@@ -27,19 +33,20 @@
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
 
-    <!-- for Fuerte -->
+<!--
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
-    <!-- for Groovy -->  
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/> 
-    
+-->    
     
     
     <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
-		<rosparam file="parameters/zero.yaml" command="load" />
+		<rosparam file="$(arg ZEROS)" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />
 		<rosparam file="parameters/gains_velSat.yaml" command="load" />
 		<rosparam file="parameters/initial_position.yaml" command="load" />
+		<param name="/comm/CAN_CH" value="$(arg CAN_CH)" />
+		<param name="/hand_info/which_hand" value="$(arg HAND)" /> <!-- See HAND arg above -->
 	</node>
 
 	
