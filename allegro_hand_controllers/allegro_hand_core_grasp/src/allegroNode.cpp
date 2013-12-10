@@ -75,7 +75,6 @@ double dt;
 
 // Initialize BHand 
 eMotionType gMotionType = eMotionType_NONE ;
-
 BHand* pBHand = NULL;
 //BHand lBHand(eHandType_Right);
 
@@ -171,17 +170,18 @@ void timerCallback(const ros::TimerEvent& event)
 		previous_velocity[i] = current_velocity[i];
 	}
 		
-	//// CAN Communication
+	/* ================================== 
+	 =        CAN COMMUNICATION         =   
+	 ================================== */
 	canDevice->setTorque(desired_torque);
 	lEmergencyStop = canDevice->update();
 	canDevice->getJointInfo(current_position);
-	//// end CAN Communication
 	
 	
 	
-	/*  ================================= 
-	=       LOWPASS FILTERING       =   
-	================================= */
+	/* ================================== 
+	 =         LOWPASS FILTERING        =   
+	 ================================== */
 	for(int i=0; i<DOF_JOINTS; i++)    
 	{
 		current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
