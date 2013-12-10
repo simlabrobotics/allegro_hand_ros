@@ -1,0 +1,7 @@
+12/10/2013
+What about hand? deprecated? need to always specifiy? Deleted from yaml?
+- Offsets, etc. parameter file path argument added to all actual-hardware launch files. Default path is "parameters/zero.yaml"
+- CAN Channel ROS argument added to all actual-hardware launch files. Default channel is "0"
+- Geometric issues on left hand URDF corrected.
+- 
+

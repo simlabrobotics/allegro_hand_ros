@@ -4,7 +4,7 @@
 hand_info:
  control_period_s: 0.003
  DOF: 16
- which_hand: 'right'
+# which_hand: 'right'
  robot_name: 'Allegro Hand'
  manufacturer: 'SimLab Co. Ltd.'
  origin: 'Seoul, South Korea'
