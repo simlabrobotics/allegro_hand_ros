@@ -49,16 +49,7 @@ Launchers
   * **allegro_hand_joint_gui.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   * **allegro_hand_joint_gui_virtual.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   
-**Note:** All four (4) of the launch files have three arguments that can be specified
-  
-  * **CONTROLLER:=**
-    * grasp (default)
-    * grasp_slp
-    * pd
-    * pd_slp
-    * velSat
-    * template
-    * template_slp
+**Note:** All launch files (including virtual hand) have three arguments that can be specified:
       
   * **HAND:=**
     * right (default)
@@ -67,6 +58,27 @@ Launchers
   * **GROOVY:=**
     * false (default, used for ROS Fuerte)
     * true  
+    
+**Note:** The following arguments can be specified for actual hardware launch file:
+
+  * **CONTROLLER:=**
+    * grasp (default)
+    * grasp_slp
+    * pd
+    * pd_slp
+    * velSat
+    * template
+    * template_slp
+    
+  * **ZEROS:=**
+    * zero.yaml (default)
+    * path to zero*.yaml file (ex. "parameters/zero_files/zero_SAH020CR020.yaml")
+    
+  * **CAN_CH:=**
+    * 0 (default)
+    * 1
+    * PEAK CAN Channel (ex. "0" or "1")
+     
     
 
 <br>
@@ -80,12 +92,19 @@ roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false
 roslaunch allegro_hand.launch
 ```  
  
- <br> 
+<br> 
 * For the PD controller on a right hand using Groovy:
 
 ```
 roslaunch allegro_hand.launch CONTROLLER:=pd GROOVY:=true
-```    
+```   
+
+<br> 
+* Using velocity saturation controller on a left, CAN Channel 1 and the offsets, etc. for Hand SAH020CR020:
+
+```
+roslaunch allegro_hand.launch CONTROLLER:=velSat HAND:=left CAN_CH:=1 ZEROS:=parameters/zero_files/zero_SAH020CR020.yaml
+```   
     
 Thanks
 ------    
