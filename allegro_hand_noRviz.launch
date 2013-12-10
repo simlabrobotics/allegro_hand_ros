@@ -29,11 +29,10 @@
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
 
-    <!-- for Fuerte -->
+<!--
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
-    <!-- for Groovy -->  
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/> 
-    
+-->    
     
     
     <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
