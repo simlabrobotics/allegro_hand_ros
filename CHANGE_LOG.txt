@@ -1,6 +1,13 @@
+CHANGE LOG
+allegro_hand_ros
+
 12/10/2013:
 - The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the
 - HAND library interfaces updated to fix left/right controller initialization bug. Left hand's pinching and grasping algorithms should now work correctly. robot_description and for the grasping library controllers.
 - Offsets, etc. parameter file path argument added to all actual-hardware launch files. Default path is "parameters/zero.yaml"
-- CAN Channel ROS argument to be added to all actual-hardware launch files. Default channel is "0". It will be much easier to run two hands without modifying the package.
+- CAN Channel ROS argument has been added to all actual-hardware launch files. Default channel is "/dev/pcan32".
 - Geometric issues on left hand URDF corrected.
+
+See README for more info.
+
+alexalspach@simlab.co.kr
