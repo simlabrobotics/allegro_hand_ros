@@ -1,14 +1,15 @@
 <launch>
 	
-	<!-- Default hand is the right hand -->
-	<arg name="HAND" default="right"/>	
+	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the robot_description and for the grasping library controllers. -->	
+	<!-- <arg name="HAND" default="right"/>	-->
+	<arg name="HAND"/> <!-- left, right -->
+	
 	<arg name="gui" default="True" />
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 	<param name="use_gui" value="$(arg gui)"/>
 	
 	<!-- This launch file is set up for ROS FUERTE by default. If you are using GROOVY, please set this param to 'true'.-->
 	<arg name="GROOVY" default="false"/>	
-
 
     <node name="joint_gui" pkg="joint_state_publisher_experimental" type="joint_state_publisher" ></node>
 	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher"/>

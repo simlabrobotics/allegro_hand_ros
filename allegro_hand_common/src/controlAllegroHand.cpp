@@ -142,11 +142,21 @@ void controlAllegroHand::init(int mode)
 	ROS_INFO("CAN: Opening device");
 	
 
-	CanHandle = LINUX_CAN_Open("/dev/pcan32", O_RDWR);
+	string CAN_CH;
+	ros::param::get("~comm/CAN_CH",CAN_CH);
+	const char * CAN_CH_c = CAN_CH.c_str();
+	
+	//ROS_WARN("[arm] Failed to find %s segment in the KDL chain with a tip at %s.", name.c_str(), chain_tip_name_.c_str());
+	
+	CanHandle = LINUX_CAN_Open(CAN_CH_c, O_RDWR);
 	if (!CanHandle)
 	{
 		//PRINT_INFO("Error in CAN_Open()");
-		ROS_ERROR("CAN: Error in CAN_Open()");
+		ROS_ERROR("CAN: Error in CAN_Open() on Channel %s", CAN_CH_c );
+	}
+	else
+	{
+		ROS_WARN("CAN: Success Opening Channel %s", CAN_CH_c );
 	}
 
 	char txt[VERSIONSTRING_LEN];

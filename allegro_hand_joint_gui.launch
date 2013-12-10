@@ -16,10 +16,11 @@
 	
 	<arg name="CONTROLLER" default="grasp"/>	
 	
-	<!-- The including on which_hand in the zero.yaml file has been deprecated. The hand (left/right) must now be specified as an argument when launching the actual hardware in ROS as an input for the robot_description and for the grasping library controllers.)-->
-	<arg name="HAND" default="right"/>
+	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the robot_description and for the grasping library controllers. -->
+	<!-- <arg name="HAND" default="right"/>	-->
+	<arg name="HAND"/> <!-- left, right -->
 	
-	<arg name="CAN_CH" default="0"/>
+	<arg name="CAN_CH" default="/dev/pcan32"/>
 	<arg name="ZEROS" default="parameters/zero.yaml"/>		
 	
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>	
