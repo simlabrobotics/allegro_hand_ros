@@ -372,6 +372,11 @@ and one fixed link will be added for the tip. -->
 	finger_angle_y=		"-${90*DEG2RAD}"
 />
 -->
+  <!--
+	finger_angle_r=		"${90*DEG2RAD}"
+	finger_angle_p=		"-${100*DEG2RAD}"	
+	finger_angle_y=		"${0*DEG2RAD}"
+	-->
   <link name="link_12.0">
     <visual>
       <geometry>
@@ -396,11 +401,11 @@ and one fixed link will be added for the tip. -->
     </collision>
   </link>
   <joint name="joint_12.0" type="revolute">
-    <axis xyz="-1 0 0"/>
+    <axis xyz="+1 0 0"/>
     <limit effort="0" lower="0.263" upper="1.396" velocity="0"/>
     <parent link="base_link"/>
     <child link="link_12.0"/>
-    <origin rpy="1.5707963259 -1.65806278845 1.5707963259" xyz="-0.0182 -0.019333 -0.045987"/>
+    <origin rpy="0 -1.65806278845 1.5707963259" xyz="-0.0182 -0.019333 -0.045987"/>
   </joint>
   <link name="link_13.0">
     <visual>
@@ -419,7 +424,7 @@ and one fixed link will be added for the tip. -->
     </collision>
   </link>
   <joint name="joint_13.0" type="revolute">
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 0 -1"/>
     <limit effort="0" lower="-0.105" upper="1.163" velocity="0"/>
     <parent link="link_12.0"/>
     <child link="link_13.0"/>

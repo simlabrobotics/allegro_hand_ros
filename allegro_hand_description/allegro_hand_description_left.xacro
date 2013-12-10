@@ -144,7 +144,13 @@ and one fixed link will be added for the tip. -->
 	finger_angle_y=		"-${90*DEG2RAD}"
 />
 -->
-
+	
+	
+	<!--
+	finger_angle_r=		"${90*DEG2RAD}"
+	finger_angle_p=		"-${100*DEG2RAD}"	
+	finger_angle_y=		"${0*DEG2RAD}"
+	-->
 <xacro:thumb_left 
 	finger_num=			"3" 
 	offset_origin_x=	"-0.0182"	
@@ -152,7 +158,8 @@ and one fixed link will be added for the tip. -->
 	offset_origin_z=	"-0.045987" 
 	
 	
-	finger_angle_r=		"${90*DEG2RAD}"
+
+	finger_angle_r=		"0"
 	finger_angle_p=		"-${95*DEG2RAD}"	
 	finger_angle_y=		"${90*DEG2RAD}"
 />
@@ -198,7 +205,7 @@ and one fixed link will be added for the tip. -->
   
 	<joint name="joint_${finger_num*4+0}" type="revolute">
 	
-    	<axis xyz="-1 0 0"/>
+    	<axis xyz="+1 0 0"/>
     	<limit effort="0" velocity="0" lower="${limit_0_t_low-joint_safety_margin}" upper="${limit_0_t_up-joint_safety_margin}" />
     	<parent link="base_link"/>
     	<child link="link_${finger_num*4+0}"/>
@@ -230,7 +237,7 @@ and one fixed link will be added for the tip. -->
   
   	<joint name="joint_${finger_num*4+1}" type="revolute">
   	
-    	<axis xyz="0 0 1"/>
+    	<axis xyz="0 0 -1"/>
      	<limit effort="0" velocity="0" lower="${limit_1_t_low+joint_safety_margin}" upper="${limit_1_t_up-joint_safety_margin}" />
     	<parent link="link_${finger_num*4+0}"/>
     	<child link="link_${finger_num*4+1}"/>
