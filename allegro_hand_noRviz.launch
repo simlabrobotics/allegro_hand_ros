@@ -17,6 +17,8 @@
 	
 	<!-- Default hand is the right hand -->
 	<arg name="HAND" default="right"/>	
+	<arg name="CAN_CH" default="0"/>
+	<arg name="ZEROS" default="parameters/zero.yaml"/>		
 	<param name="robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 	
 	<!-- This launch file is set up for ROS FUERTE by default. If you are using GROOVY, please set this param to 'true'.-->
@@ -36,10 +38,11 @@
     
     <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
-		<rosparam file="parameters/zero.yaml" command="load" />
+		<rosparam file="$(arg ZEROS)" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />
 		<rosparam file="parameters/gains_velSat.yaml" command="load" />
 		<rosparam file="parameters/initial_position.yaml" command="load" />
+		<param name="/comm/CAN_CH" value="$(arg CAN_CH)" />
 	</node>
 
 	
