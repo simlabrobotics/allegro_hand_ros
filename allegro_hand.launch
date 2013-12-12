@@ -19,6 +19,7 @@
 	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. Which hand (left/right) must now be specified as an argument when launching the Allegro Hand as an input for both the robot_description and for the grasping library controllers. -->
 	<!-- <arg name="HAND" default="right"/>	-->
 	<arg name="HAND"/> <!-- left, right -->
+	<arg name="NUM" default='0'/> <!-- 0, 1, 2 ..  -->	
 	
 	<arg name="CAN_CH" default="/dev/pcan32"/>
 	<arg name="ZEROS" default="parameters/zero.yaml"/>	
@@ -45,7 +46,7 @@
     
   
     
-    <node name="allegro_hand" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
+    <node name="allegro_hand_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
     	<!--parameters are within the scope of the hand node so that multiple hands can be run at the same time -->
 		<rosparam file="$(arg ZEROS)" command="load" />
 		<rosparam file="parameters/gains_pd.yaml" command="load" />
