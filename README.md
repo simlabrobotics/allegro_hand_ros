@@ -14,6 +14,8 @@ ROS specific information can be found on the [ROS wiki](http://www.ros.org/wiki/
 
 **Announcement:** The next major release of this stack will include the integration of certain sensor systems
 
+**Note:** If controlling multiple allegro hands at once, please see the appropriate section below.
+
 
 Contents
 --------
@@ -58,9 +60,8 @@ Launchers
     * **Note:** There is no default. This arg must be specified.
     
   * **NUM:=** (Used to enumerate the hands when multiple will be controlled at once / Prevents naming and data conflicts)
-    * right
-    * left
-    * **Note:** There is no default. This arg must be specified.    
+    * 0 (default)
+    * Any Integer (1, 2, 3, ... )   
       
   * **GROOVY:=** (Specify ROS distro)
     * false (default, used for ROS Fuerte)
@@ -111,6 +112,16 @@ roslaunch allegro_hand.launch CONTROLLER:=pd GROOVY:=true
 ```
 roslaunch allegro_hand.launch CONTROLLER:=velSat HAND:=left CAN_CH:=1 ZEROS:=parameters/zero_files/zero_SAH020CR020.yaml
 ```   
+    
+Controlling More Than One Hand
+------------------------------
+
+*When running more than one hand using ROS, you must specify the number of the hand when launching.
+
+```
+  roslaunch allegro_hand.launch HAND:=right ZEROS:=parameters/zero0.yaml NUM:=0 CAN_CH:=/dev/pcan0 
+  roslaunch allegro_hand.launch HAND:=left  ZEROS:=parameters/zero1.yaml NUM:=1 CAN_CH:=/dev/pcan1
+```    
     
 Thanks
 ------    
