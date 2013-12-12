@@ -35,14 +35,14 @@
 
 
 
-	<node name="jointState2tf" pkg="robot_state_publisher" type="state_publisher">
+	<node name="jointState2tf_$(arg NUM)" pkg="robot_state_publisher" type="state_publisher">
         <remap from="joint_states" to="/allegroHand/joint_states"/>
     </node>
     
     <!-- for Fuerte -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
+    <node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)"/>
     <!-- for Groovy -->  
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/>
+    <node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)"/>
     
   
     
@@ -57,10 +57,10 @@
 	</node>
 
 	
-	<node name="keyboard" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
+	<node name="keyboard_$(arg NUM)" pkg="allegro_hand_keyboard" type="allegro_hand_keyboard" output="screen"></node>
 	
 	<!--
-	<node pkg="rxtools" type="rxplot" name="plot_speed" 
+	<node pkg="rxtools" type="rxplot" name="plot_speed_$(arg NUM)" 
 	args="/allegroHand/joint_desired_states/position[9],/allegroHand/joint_current_states/position[9]
 	/allegroHand/joint_desired_states/velocity[9],/allegroHand/joint_current_states/velocity[9]
 	/allegroHand/joint_current_states/effort[9]" />
