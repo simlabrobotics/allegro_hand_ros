@@ -32,9 +32,6 @@
 #define LIB_CMD_TOPIC "/allegroHand/lib_cmd"
 
 
-
-
-
 double desired_position[DOF_JOINTS] 			= {0.0};
 double current_position[DOF_JOINTS] 			= {0.0};
 double previous_position[DOF_JOINTS] 			= {0.0};

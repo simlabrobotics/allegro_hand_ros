@@ -45,26 +45,30 @@ Contents
   
 Launchers
 ---------
-  * **allegro_hand.launch:** Launches Allegro Hand with specified controller. Also launches keyboard controller and rviz visualizer.
-  * **allegro_hand_noRviz.launch:** Launches Allegro Hand with specified controller. Also launches keyboard controller and DOES NOT launch rviz visualizer.  
-  * **allegro_hand_joint_gui.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
-  * **allegro_hand_joint_gui_virtual.launch:** Launches Allegro Hand with specified controller. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
+  * **allegro_hand.launch:** Launches Allegro Hand with specified controller (default = grasp). Also launches keyboard controller and rviz visualizer.
+  * **allegro_hand_noRviz.launch:** Launches Allegro Hand with specified controller (default = grasp). Also launches keyboard controller and DOES NOT launch rviz visualizer.  
+  * **allegro_hand_joint_gui.launch:** Launches Allegro Hand with PD controller by defauly. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
+  * **allegro_hand_joint_gui_virtual.launch:** Launches Allegro Hand kinematic model. Also launches a GUI interface for controlling each joint within its limits and rviz visualizer.
   
-**Note:** All launch files (including virtual hand) have three arguments that can be specified:
+**Note:** All launch files (including virtual and actual hand) have the following arguments that can be specified:
       
-  * **HAND:=**
+  * **HAND:=** (Used to specify which hand is being controlled)
     * right
     * left
     * **Note:** There is no default. This arg must be specified.
     
+  * **NUM:=** (Used to enumerate the hands when multiple will be controlled at once / Prevents naming and data conflicts)
+    * right
+    * left
+    * **Note:** There is no default. This arg must be specified.    
       
-  * **GROOVY:=**
+  * **GROOVY:=** (Specify ROS distro)
     * false (default, used for ROS Fuerte)
     * true  
     
-**Note:** The following arguments can be specified for actual hardware launch file:
+**Note:** Also, the following arguments can be specified for actual hardware launch file:
 
-  * **CONTROLLER:=**
+  * **CONTROLLER:=** (Specify the controller / Grasp library or simple joint space controller)
     * grasp (default)
     * grasp_slp
     * pd
@@ -73,11 +77,11 @@ Launchers
     * template
     * template_slp
     
-  * **ZEROS:=**
+  * **ZEROS:=** (Specify the encoder/motor offsets and directions parameter file)
     * zero.yaml (default)
     * path to zero*.yaml file (ex. "parameters/zero_files/zero_SAH020CR020.yaml")
     
-  * **CAN_CH:=**
+  * **CAN_CH:=** (Specify the CAN channel to which the hand is connected)
     * /dev/pcan32 (default)
     * another PEAK CAN Channel (see in /dev/*)
      
