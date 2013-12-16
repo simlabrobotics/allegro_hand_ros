@@ -10,7 +10,7 @@
 		   -velSat
 		   -template
 		   -template_slp 
-		 *The default controller is 'grasp' which emplys the included grasping library. -->
+		 *The default controller is 'grasp' which employs the included grasping library. -->
 	
 	
 	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. 
