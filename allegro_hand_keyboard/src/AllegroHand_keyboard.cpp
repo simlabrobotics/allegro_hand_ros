@@ -122,7 +122,7 @@ private:
 	count_(0),
 	edit_(0.0)
 {
-	cmd_pub_ = nh_.advertise<std_msgs::String>("allegroHand/lib_cmd", 10);
+	cmd_pub_ = nh_.advertise<std_msgs::String>("/allegroHand/lib_cmd", 10);
 }
 
 
@@ -184,14 +184,14 @@ void AHKeyboard::keyLoop()
   	std::cout << "\tGrasp (3 fingers):\t\t'G'" << std::endl; 
   	std::cout << "\tGrasp (4 fingers):\t\t'F'" << std::endl;  
   	std::cout << "\tGrasp (envelop):\t\t'E'" << std::endl;  
+  	std::cout << "\tMotors Off (free motion):\t'O'" << std::endl;  	
   	std::cout << "\tSave Current Pose:\t\t'S'" << std::endl;  
   	std::cout << "\tPD Control (last saved):\t'Space'" << std::endl;   		
-  	std::cout << "\tMotors Off:\t\t\t'O'" << std::endl;
 	std::cout << " -----------------------------------------------------------------------------" << std::endl;  	  	
-	std::cout << "  Note: Unless elsewhere implemented, these keyboard commands only work with " << std::endl;    
-	std::cout << "  the 'allegro_hand_core_grasp' and 'allegro_hand_core_grasp_slp' packages." << std::endl;	  	
+	//std::cout << "  Note: Unless elsewhere implemented, these keyboard commands only work with " << std::endl;    
+	//std::cout << "  the 'allegro_hand_core_grasp' and 'allegro_hand_core_grasp_slp' packages." << std::endl;	  	
 	std::cout << "  Subscriber code for reading these messages is included in '~core_template'." << std::endl;		
-	std::cout << " -----------------------------------------------------------------------------\n\n" << std::endl;  		  	
+	std::cout << " -----------------------------------------------------------------------------\n" << std::endl;  		  	
 
   for(;;)
   {

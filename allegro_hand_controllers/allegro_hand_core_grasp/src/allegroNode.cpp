@@ -330,6 +330,10 @@ int main(int argc, char** argv)
 	// Starts control loop, message pub/subs and all other callbacks
 	ros::spin();			
 
+	// Prompt user to press enter to quit node for viewing failed launch or system after CAN error
+	//cout << "Press Enter to Continue";
+	//cin.ignore();
+
 	// Clean shutdown: shutdown node, shutdown can, be polite.
 	nh.shutdown();
 	delete canDevice;
