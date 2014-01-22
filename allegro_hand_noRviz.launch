@@ -19,7 +19,7 @@
 		 
 	<arg name="HAND"/> 									<!-- left, right -->
 	<arg name="NUM" default='0'/>						<!-- 0, 1, 2, ...  -->	
-	<arg name="CAN_CH" default="/dev/pcan32"/>			<!-- ls /dev to see your open CAN ports -->
+	<arg name="CAN_CH" default="/dev/pcanusb0"/>			<!-- ls -l /dev/pcan*    to see your open CAN ports -->
 	<arg name="ZEROS" default="parameters/zero.yaml"/>	<!-- yaml param files for your hand can be found in parameters/zero_files/ -->
 	
 	<param name="/robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>

@@ -211,8 +211,13 @@ void timerCallback(const ros::TimerEvent& event)
 			lIsBegin = true;
 			}
 			
-			// Start joint position control (Bhand)
-			pBHand->SetMotionType(eMotionType_JOINT_PD);
+			// Start joint position control (Bhand) in initial position
+			// Commented out for safety incase the joint offsets or directions are incorrect
+			//pBHand->SetMotionType(eMotionType_JOINT_PD);
+
+			// Starts with motors off but encoder data is read and can be visualized
+			pBHand->SetMotionType(eMotionType_NONE);
+		
 			pBHand->UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
 			for(int i=0; i<DOF_JOINTS; i++) desired_torque[i] = 0.0;
 		}
