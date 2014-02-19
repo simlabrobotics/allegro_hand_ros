@@ -17,6 +17,7 @@
 
 # built stuff
 *build/
+*bin/
 
 # closed-source
 #*underDevelopment/
