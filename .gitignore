@@ -19,6 +19,9 @@
 *build/
 *bin/
 
+# Python
+*.pyc
+
 # closed-source
 #*underDevelopment/
 #*old/
