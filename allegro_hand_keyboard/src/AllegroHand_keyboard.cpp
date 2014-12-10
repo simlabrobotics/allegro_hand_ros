@@ -179,7 +179,7 @@ void AHKeyboard::keyLoop()
 	
   	std::cout << "\tHome Pose:\t\t\t'H'" << std::endl;  
   	std::cout << "\tReady Pose:\t\t\t'R'" << std::endl; 
-  	std::cout << "\tPinch (index+thumb):\t\t'I'" << std::endl; 
+  	std::cout << "\tPinch (index+thumb):\t\t'P'" << std::endl; 
   	std::cout << "\tPinch (middle+thumb):\t\t'M'" << std::endl; 
   	std::cout << "\tGrasp (3 fingers):\t\t'G'" << std::endl; 
   	std::cout << "\tGrasp (4 fingers):\t\t'F'" << std::endl;  
@@ -212,7 +212,7 @@ void AHKeyboard::keyLoop()
 
 	switch(c)
     {
-		case VK_SPACE:
+	case VK_SPACE:
         	ROS_DEBUG("space bar: PD Control");
         	//cmd_ = 4;
         	ss << "pdControl";
@@ -254,19 +254,19 @@ void AHKeyboard::keyLoop()
         	ss << "pinch_mt";
         	dirty = true;
         	break;  
-		case KEYCODE_e:
+	case KEYCODE_e:
         	ROS_DEBUG("e_key: Envelop");
         	//cmd_ = 4;
         	ss << "envelop";
         	dirty = true;
         	break;  
-		case KEYCODE_o:
+	case KEYCODE_o:
         	ROS_DEBUG("o_key: Servos Off");
         	//cmd_ = 4;
         	ss << "off";
         	dirty = true;
         	break; 
-		case KEYCODE_s:
+	case KEYCODE_s:
         	ROS_DEBUG("s_key: Save joint pos. for PD control");
         	//cmd_ = 4;
         	ss << "save";
