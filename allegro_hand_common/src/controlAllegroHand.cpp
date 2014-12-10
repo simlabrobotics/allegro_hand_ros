@@ -41,11 +41,7 @@ controlAllegroHand::controlAllegroHand()
 	// the channels used differ from versions 1.0 to 2.0
 	
 	ros::param::get("~hand_info/version",hand_version);
-	if (hand_version == 3.0)
-	  tau_cov_const = 1200.0;
-	else
-	  tau_cov_const = 800.0;
-	ROS_INFO("Hand Version: %2.1f\n", hand_version);
+
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
 	mPWM_MAX[eJOINTNAME_INDEX_1] = PWM_LIMIT_NEAR;
@@ -249,6 +245,26 @@ void controlAllegroHand::init(int mode)
 	ROS_INFO("CAN: Communicating");
 }
 
+//KCX
+int controlAllegroHand::Update(void)
+{
+	writeDevices();
+	int itr = 0;
+	while (itr < 4)
+	  {
+	    itr += readDevices();
+	  }
+
+	if(mEmergencyStop == true)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 int controlAllegroHand::update(void)
 {
 	_readDevices();
@@ -286,6 +302,53 @@ void controlAllegroHand::getJointInfo(double *position)
 		position[i] = curr_position[i];
 		//torque[i] = curr_torque[i];
 	}
+}
+
+int controlAllegroHand::readDevices()
+{
+	double q[4];
+	char lID;
+	int ret = 0;
+	int itr = 0;
+	static int errorcnt = 0;
+	TPCANRdMsg lmsg;
+
+	//while( itr<4 )
+	//while( true)
+	{
+	  //ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 3000); // timeout in micro second
+		ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 0); // 0 : polling
+
+		if (!ret)
+		  {
+			lID  = _parseCANMsg( lmsg.Msg, q);
+			if( (lID >= ID_DEVICE_SUB_01) && (lID <= ID_DEVICE_SUB_04) )
+			{
+				for(int i=0; i<4; i++)
+				{
+					curr_position[i+4*(lID-ID_DEVICE_SUB_01)] = q[i];
+				}
+				itr++;
+				//printf("%d, ", lID );
+			}
+			else if( lID == 0)
+			{
+				errorcnt = 0;
+				//printf("(%d), ", lID );
+			}
+			else if( lID < 0 )
+			{
+				mEmergencyStop = true;
+			}
+		}
+	}
+	return itr;
+}
+
+int controlAllegroHand::writeDevices()
+{
+  _writeDevices();
+  return 0;
 }
 
 void controlAllegroHand::_readDevices()
@@ -356,9 +419,9 @@ void controlAllegroHand::_writeDevices()
 
 	// convert to torque to pwm
 	for(int i=0; i<DOF_JOINTS; i++ ){
-		pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] * tau_cov_const;
+		pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] *800.0;
 
-		mPWM_MAX[i] = tau_cov_const;
+		mPWM_MAX[i] = 800.0;
 
 		// limitation should be less than 800
 		if     ( pwmDouble[i] >  mPWM_MAX[i] )

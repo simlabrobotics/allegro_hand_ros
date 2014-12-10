@@ -36,11 +36,17 @@ public:
 
 	void init(int mode = 0);
 	int update(void);
+	int Update(void); //KCX
 	int  command(const short& cmd, const int& arg = 0);
 
 	void setTorque(double *torque);
 //	void getJointInfo(double *position, double *torque);
 	void getJointInfo(double *position);
+
+	//KCX
+	int readDevices();
+	int writeDevices();
+	bool emergencyStop() { return mEmergencyStop; }
 
 private:
 	HANDLE CanHandle;
@@ -53,7 +59,6 @@ private:
 	double desired_torque[DOF_JOINTS];
 	
 	double hand_version;
-	double tau_cov_const;
 
 	double mPWM_MAX[DOF_JOINTS];
 	int    mEncoderOffset[DOF_JOINTS];
