@@ -41,7 +41,12 @@ controlAllegroHand::controlAllegroHand()
 	// the channels used differ from versions 1.0 to 2.0
 	
 	ros::param::get("~hand_info/version",hand_version);
-
+	//KCX
+	if (hand_version == 3.0)
+	  tau_cov_const = 1200.0;
+	else
+	  tau_cov_const = 800.0;
+	ROS_INFO("Hand Version: %2.1f\n", hand_version);
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
 	mPWM_MAX[eJOINTNAME_INDEX_1] = PWM_LIMIT_NEAR;
@@ -419,9 +424,9 @@ void controlAllegroHand::_writeDevices()
 
 	// convert to torque to pwm
 	for(int i=0; i<DOF_JOINTS; i++ ){
-		pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] *800.0;
+	        pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] * tau_cov_const; //KCX
 
-		mPWM_MAX[i] = 800.0;
+		mPWM_MAX[i] = tau_cov_const; //KCX
 
 		// limitation should be less than 800
 		if     ( pwmDouble[i] >  mPWM_MAX[i] )
@@ -474,7 +479,7 @@ if (hand_version == 1.0 )
 		data[7] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
 
 		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
-		usleep(10);
+		//usleep(10); //KCX
 	}
 
 }
@@ -492,7 +497,7 @@ else if (hand_version >= 2.0 )
 		data[7] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
 
 		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
-		usleep(10);
+		//usleep(10); //KCX
 	}
 }	
 else

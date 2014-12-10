@@ -59,6 +59,7 @@ private:
 	double desired_torque[DOF_JOINTS];
 	
 	double hand_version;
+	double tau_cov_const;
 
 	double mPWM_MAX[DOF_JOINTS];
 	int    mEncoderOffset[DOF_JOINTS];
