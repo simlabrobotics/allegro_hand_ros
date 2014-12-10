@@ -174,7 +174,8 @@ void timerCallback(const ros::TimerEvent& event)
 	 =        CAN COMMUNICATION         =   
 	 ================================== */
 	canDevice->setTorque(desired_torque);
-	lEmergencyStop = canDevice->update();
+	//	lEmergencyStop = canDevice->update(); //KCX
+	lEmergencyStop = canDevice->Update(); //KCX
 	canDevice->getJointInfo(current_position);
 	
 	
@@ -271,7 +272,8 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 
 	// Setup timer callback
-	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
+	//	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback); //KCX
+	ros::Timer timer = nh.createTimer(ros::Duration(0.001), timerCallback); //KCX
 
 	mutex = new boost::mutex();
 

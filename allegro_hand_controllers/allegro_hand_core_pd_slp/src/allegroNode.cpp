@@ -286,7 +286,8 @@ int main(int argc, char** argv)
     =       CAN COMMUNICATION       = 
     ================================= */	
 	canDevice->setTorque(desired_torque);		// WRITE joint torque
-	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
+	//	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error //KCX
+	lEmergencyStop = canDevice->Update(); 		// Returns -1 in case of an error //KCX
 	canDevice->getJointInfo(current_position);	// READ current joint positions
 
 		
@@ -348,7 +349,7 @@ int main(int argc, char** argv)
 
 
 			ros::spinOnce();
-			rate.sleep();	
+			//rate.sleep();	//KCX
 	}
 
 	// Starts control loop, message pub/subs and all other callbacks

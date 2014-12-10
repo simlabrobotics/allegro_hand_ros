@@ -64,15 +64,15 @@ double desired_torque[DOF_JOINTS] 				= {0.0};
 double v[DOF_JOINTS] 							= {0.0};	
 
 
-double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1200.0,	// Default P Gains for Velocity Saturation Controller
-										1200.0,  1200.0,  1200.0, 1200.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
-										1200.0,  1200.0,  1200.0, 1200.0,
-									    1200.0,  1200.0,  1200.0, 1200.0 };
+double k_p[DOF_JOINTS] 				= { 1200.0,  1200.0,  1200.0, 1000.0,	// Default P Gains for Velocity Saturation Controller
+										1200.0,  1200.0,  1200.0, 1000.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
+										1200.0,  1200.0,  1200.0, 1000.0,
+									    1200.0,  1200.0,  1200.0, 1000.0 };
 
-double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   140.0,	// Default D Gains for Velocity Saturation Controller
-										 140.0,   140.0,   140.0,   140.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
-										 140.0,   140.0,   140.0,   140.0,
-										 140.0,   140.0,   140.0,   140.0 };
+double k_d[DOF_JOINTS] 				= {  140.0,   140.0,   140.0,   120.0,	// Default D Gains for Velocity Saturation Controller
+										 140.0,   140.0,   140.0,   120.0,	// These gains are loaded if the 'gains_velSat.yaml' file is not loaded.
+										 140.0,   140.0,   140.0,   120.0,
+										 140.0,   140.0,   140.0,   120.0 };
 
 			 
 double v_max[DOF_JOINTS] 				= {  10.0,   10.0,   10.0,   10.0, 	// Velocity limits 
@@ -211,7 +211,8 @@ void timerCallback(const ros::TimerEvent& event)
     =       CAN COMMUNICATION       = 
     ================================= */	
 	canDevice->setTorque(desired_torque);		// WRITE joint torque
-	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
+	//	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error //KCX
+	lEmergencyStop = canDevice->Update(); 		// Returns -1 in case of an error //KCX
 	canDevice->getJointInfo(current_position);	// READ current joint positions
 
 
@@ -260,7 +261,7 @@ void timerCallback(const ros::TimerEvent& event)
 		for(int i=0; i<DOF_JOINTS; i++)    
 		{
 			desired_torque[i] = -k_d[i]*( current_velocity_filtered[i] - v[i]*desired_velocity[i] );
-			desired_torque[i] = desired_torque[i]/800.0;
+			desired_torque[i] = desired_torque[i]/800.0; //XXX
 		}
 	}		
 
@@ -318,7 +319,8 @@ int main(int argc, char** argv)
 	
 	
 	// Setup timer callback (ALLEGRO_CONTROL_TIME_INTERVAL = 0.003)
-	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
+	//	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback); //KCX
+	ros::Timer timer = nh.createTimer(ros::Duration(0.001), timerCallback); //KCX
 
 	mutex = new boost::mutex();
 

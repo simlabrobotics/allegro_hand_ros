@@ -251,7 +251,8 @@ int main(int argc, char** argv)
 		 =        CAN COMMUNICATION         =   
 		 ================================== */
 		canDevice->setTorque(desired_torque);
-		lEmergencyStop = canDevice->update();
+		//lEmergencyStop = canDevice->update(); //KCX
+		lEmergencyStop = canDevice->Update(); //KCX
         canDevice->getJointInfo(current_position);
 		
 		
@@ -328,7 +329,7 @@ int main(int argc, char** argv)
 			frame++;	
 
 			ros::spinOnce();
-			rate.sleep();	
+			//rate.sleep();	//KCX
 	}
 
 	// Clean shutdown: shutdown node, shutdown can, be polite.

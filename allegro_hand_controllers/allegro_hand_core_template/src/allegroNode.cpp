@@ -137,7 +137,8 @@ void timerCallback(const ros::TimerEvent& event)
     =       CAN COMMUNICATION       = 
     ================================= */	
 	canDevice->setTorque(desired_torque);		// WRITE joint torque
-	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error
+	//	lEmergencyStop = canDevice->update(); 		// Returns -1 in case of an error //KCX
+	lEmergencyStop = canDevice->Update(); 		// Returns -1 in case of an error //KCX
 	canDevice->getJointInfo(current_position);	// READ current joint positions
 
 		
@@ -210,7 +211,8 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 
 	// Setup timer callback (ALLEGRO_CONTROL_TIME_INTERVAL = 0.003)
-	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback);
+	//	ros::Timer timer = nh.createTimer(ros::Duration(0.003), timerCallback); //KCX
+	ros::Timer timer = nh.createTimer(ros::Duration(0.001), timerCallback); //KCX
 
 	mutex = new boost::mutex();
 
