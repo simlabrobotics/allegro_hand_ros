@@ -142,10 +142,10 @@ K.C. Chang <kcchang@simlab.co.kr>
 **Note:** As stated above, control loops utilizing both timer callbacks and ROS' Rate object are included. Generally, the timer callback is more reliable as it will run the control code in a new thread if the previous iteration fails to end within the given crol period. The rate object, aling with a spinOnce() and a sleep, generally does a fine job but some anomolies have been recognized where the loop toaks much too long and remains blocked until finishing. Using the rate/sleep method allows for simpler code. However, due to Allegro Hand's own real time clock sampling rate (@333Hz) to write 16 encoder values to the CAN bus, interrupt/rate/sleep can cause conflicts in the CAN communication resulting unstable motions. Finally, we mention our preferred solution one more time. The solution is to have the main control loop polling the CAN-readDevice(). readDevice() will return when 16 encoder values are availbe and read in the CAN bus. Since Allegro Hand automatically writes 16 encoder values in every 1/333 sec, this polling method provides the stable sampling rate of 333 Hz!!! 
 
 Loop:
-		writeTorque()
-		readEncoder()
-		userInterface()
-		computeTorque()
+* writeTorque()
+* readEncoder()
+* userInterface()
+* computeTorque()
  
 For Allegro Hand v3.0
 ---------------------
