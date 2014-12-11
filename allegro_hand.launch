@@ -1,17 +1,14 @@
 <launch>
 	
 	
-	<arg name="CONTROLLER" default="grasp"/> <!-- grasp, pd, ..  -->	
+	<arg name="CONTROLLER" default="grasp"/> <!-- grasp, pd, velSat  -->	
 	<!-- Controllers include:
 		   -grasp *
-		   -grasp_slp
 		   -pd
-		   -pd_slp
 		   -velSat
-		   -template
-		   -template_slp 
-		 *The default controller is 'grasp' which employs the included grasping library. -->
+		 *The default controller is 'grasp' which employs the included grasping library (libBHand). -->
 	
+	<arg name="polling default="true"/> 									<!-- true, false for polling the CAN communication -->
 	
 	<!-- The inclusion of which_hand in the zero.yaml file has been deprecated. 
 		 Which hand (left/right) must now be specified as an argument when launching the Allegro Hand
@@ -31,12 +28,8 @@
 
 
 
-
-
-
-
   	<!-- Allegro Hand controller and communication node -->  
-    <node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true">
+    <node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true" args="$(arg polling)">
     
     	<!-- Remapping of topics into enumerated allegroHand_# namespace -->
     	<remap from="/allegroHand/joint_states" to="/allegroHand_$(arg NUM)/joint_states"/>

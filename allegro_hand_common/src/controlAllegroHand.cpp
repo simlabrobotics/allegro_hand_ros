@@ -6,6 +6,8 @@
  *  Author: 			Seungsu Kim & Alex Alspach
  */
 
+// 20141210: kcchang: added polling style readDevice() and Update()
+
 #include "controlAllegroHand.h"
 #include <iostream>
 #include <math.h>
@@ -14,9 +16,6 @@
 #include <string>
 
 using namespace std;
-
-
-
 
 void PRINT_INFO(const char *msg)
 {
@@ -43,9 +42,9 @@ controlAllegroHand::controlAllegroHand()
 	ros::param::get("~hand_info/version",hand_version);
 	//KCX
 	if (hand_version == 3.0)
-	  tau_cov_const = 1200.0;
+		tau_cov_const = 1200.0;
 	else
-	  tau_cov_const = 800.0;
+		tau_cov_const = 800.0;
 	ROS_INFO("Hand Version: %2.1f\n", hand_version);
 
 	mPWM_MAX[eJOINTNAME_INDEX_0] = PWM_LIMIT_ROLL;
@@ -117,10 +116,8 @@ controlAllegroHand::controlAllegroHand()
 	ros::param::get("~zero/motor_direction/j30",mMotorDirection[eJOINTNAME_THUMB_0]);
 	ros::param::get("~zero/motor_direction/j31",mMotorDirection[eJOINTNAME_THUMB_1]);
 	ros::param::get("~zero/motor_direction/j32",mMotorDirection[eJOINTNAME_THUMB_2]);
-	ros::param::get("~zero/motor_direction/j33",mMotorDirection[eJOINTNAME_THUMB_3]);	
-	
+	ros::param::get("~zero/motor_direction/j33",mMotorDirection[eJOINTNAME_THUMB_3]);		
 }
-
 
 controlAllegroHand::~controlAllegroHand()
 {
@@ -138,7 +135,6 @@ controlAllegroHand::~controlAllegroHand()
 
 void controlAllegroHand::init(int mode)
 {
-
 	unsigned char data[8];
 	int ret;
 	TPCANRdMsg lmsg;
@@ -146,7 +142,6 @@ void controlAllegroHand::init(int mode)
 	//PRINT_INFO("Opening CAN device");
 	ROS_INFO("CAN: Opening device");
 	
-
 	string CAN_CH;
 	ros::param::get("~comm/CAN_CH",CAN_CH);
 	const char * CAN_CH_c = CAN_CH.c_str();
@@ -171,7 +166,8 @@ void controlAllegroHand::init(int mode)
 		//PRINT_INFO(txt);
 		ROS_INFO("CAN: %s", txt);
 	}
-	else {
+	else
+	{
 		//PRINT_INFO("Error getting CAN_VersionInfo()");
 		ROS_ERROR("CAN: Error in CAN_VersionInfo()");
 	}
@@ -236,11 +232,13 @@ void controlAllegroHand::init(int mode)
 			cnt++;
 			if(cnt == 8) break;
 		}
-		else{
+		else
+		{
 			itr++;
 		}
 
-		if(itr > 4){
+		if(itr > 4)
+		{
 			mEmergencyStop = true;
 			break;
 		}
@@ -256,9 +254,9 @@ int controlAllegroHand::Update(void)
 	writeDevices();
 	int itr = 0;
 	while (itr < 4)
-	  {
+	{
 	    itr += readDevices();
-	  }
+	}
 
 	if(mEmergencyStop == true)
 	{
@@ -318,33 +316,28 @@ int controlAllegroHand::readDevices()
 	static int errorcnt = 0;
 	TPCANRdMsg lmsg;
 
-	//while( itr<4 )
-	//while( true)
-	{
-	  //ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 3000); // timeout in micro second
-		ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 0); // 0 : polling
+	ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 0); // 0 : polling
 
-		if (!ret)
-		  {
-			lID  = _parseCANMsg( lmsg.Msg, q);
-			if( (lID >= ID_DEVICE_SUB_01) && (lID <= ID_DEVICE_SUB_04) )
+	if (!ret)
+	{
+		lID  = _parseCANMsg( lmsg.Msg, q);
+		if( (lID >= ID_DEVICE_SUB_01) && (lID <= ID_DEVICE_SUB_04) )
+		{
+			for(int i=0; i<4; i++)
 			{
-				for(int i=0; i<4; i++)
-				{
-					curr_position[i+4*(lID-ID_DEVICE_SUB_01)] = q[i];
-				}
-				itr++;
-				//printf("%d, ", lID );
+				curr_position[i+4*(lID-ID_DEVICE_SUB_01)] = q[i];
 			}
-			else if( lID == 0)
-			{
-				errorcnt = 0;
-				//printf("(%d), ", lID );
-			}
-			else if( lID < 0 )
-			{
-				mEmergencyStop = true;
-			}
+			itr++;
+			//printf("%d, ", lID );
+		}
+		else if( lID == 0)
+		{
+			errorcnt = 0;
+			//printf("(%d), ", lID );
+		}
+		else if( lID < 0 )
+		{
+			mEmergencyStop = true;
 		}
 	}
 	return itr;
@@ -352,8 +345,8 @@ int controlAllegroHand::readDevices()
 
 int controlAllegroHand::writeDevices()
 {
-  _writeDevices();
-  return 0;
+	_writeDevices();
+	return 0;
 }
 
 void controlAllegroHand::_readDevices()
@@ -366,10 +359,8 @@ void controlAllegroHand::_readDevices()
 	TPCANRdMsg lmsg;
 
 	while( itr<4 )
-	//while( true)
 	{
 		ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 3000); // timeout in micro second
-		//ret=LINUX_CAN_Read_Timeout(CanHandle, &lmsg, 0); // 0 : polling
 
 		if (ret)
 		{
@@ -399,7 +390,6 @@ void controlAllegroHand::_readDevices()
 		}
 	}
 
-
 	if( itr < 4)
 	{
 		//printf(": %d  \n", itr );
@@ -408,12 +398,11 @@ void controlAllegroHand::_readDevices()
 			mEmergencyStop = true;
 		}
 	}
-	else{
+	else
+	{
 		//printf(": %d  \n", itr );
 		errorcnt = 0;
 	}
-
-
 }
 
 void controlAllegroHand::_writeDevices()
@@ -423,18 +412,20 @@ void controlAllegroHand::_writeDevices()
 	unsigned char data[8];
 
 	// convert to torque to pwm
-	for(int i=0; i<DOF_JOINTS; i++ ){
-	        pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] * tau_cov_const; //KCX
+	for(int i=0; i<DOF_JOINTS; i++ )
+	{
+		pwmDouble[i] =  desired_torque[i] *1.0 * (double)mMotorDirection[i] * tau_cov_const; //KCX
 
 		mPWM_MAX[i] = tau_cov_const; //KCX
 
 		// limitation should be less than 800
-		if     ( pwmDouble[i] >  mPWM_MAX[i] )
+		if ( pwmDouble[i] >  mPWM_MAX[i] )
 		{
 			pwmDouble[i] =  mPWM_MAX[i];
 			//cout <<i << " max"<< endl;
 		}
-		else if( pwmDouble[i] < -mPWM_MAX[i] ) {
+		else if( pwmDouble[i] < -mPWM_MAX[i] )
+		{
 			pwmDouble[i] = -mPWM_MAX[i];
 			//cout <<i<< " min"<< endl;
 		}
@@ -444,66 +435,68 @@ void controlAllegroHand::_writeDevices()
 	
 	
 	// ZEROS FOR TESTING
-        /*
-	pwm[eJOINTNAME_INDEX_0] = 0;
-	pwm[eJOINTNAME_INDEX_1] = 0;
-	pwm[eJOINTNAME_INDEX_2] = 0;
-	pwm[eJOINTNAME_INDEX_3] = 0;
-	pwm[eJOINTNAME_MIDDLE_0] = 0;
-	pwm[eJOINTNAME_MIDDLE_1] = 0;
-	pwm[eJOINTNAME_MIDDLE_2] = 0;
-	pwm[eJOINTNAME_MIDDLE_3] = 0;
-	pwm[eJOINTNAME_PINKY_0] = 0;
-	pwm[eJOINTNAME_PINKY_1] = 0;
-	pwm[eJOINTNAME_PINKY_2] = 0;
-	pwm[eJOINTNAME_PINKY_3] = 0;
-	pwm[eJOINTNAME_THUMB_0] = 0;
-	pwm[eJOINTNAME_THUMB_1] = 0;
-	pwm[eJOINTNAME_THUMB_2] = 0;
-	pwm[eJOINTNAME_THUMB_3] = 0;
-        */
+	/*
+	  pwm[eJOINTNAME_INDEX_0] = 0;
+	  pwm[eJOINTNAME_INDEX_1] = 0;
+	  pwm[eJOINTNAME_INDEX_2] = 0;
+	  pwm[eJOINTNAME_INDEX_3] = 0;
+	  pwm[eJOINTNAME_MIDDLE_0] = 0;
+	  pwm[eJOINTNAME_MIDDLE_1] = 0;
+	  pwm[eJOINTNAME_MIDDLE_2] = 0;
+	  pwm[eJOINTNAME_MIDDLE_3] = 0;
+	  pwm[eJOINTNAME_PINKY_0] = 0;
+	  pwm[eJOINTNAME_PINKY_1] = 0;
+	  pwm[eJOINTNAME_PINKY_2] = 0;
+	  pwm[eJOINTNAME_PINKY_3] = 0;
+	  pwm[eJOINTNAME_THUMB_0] = 0;
+	  pwm[eJOINTNAME_THUMB_1] = 0;
+	  pwm[eJOINTNAME_THUMB_2] = 0;
+	  pwm[eJOINTNAME_THUMB_3] = 0;
+	*/
 	//pwm[eJOINTNAME_THUMB_1] = 0;
 
 
-if (hand_version == 1.0 )
-{
-	// for Allegro Hand v1.0
-	for(int findex=0; findex<4; findex++ ){
-		data[0] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
-		data[1] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
-		data[2] = (unsigned char)( (pwm[1+findex*4] >> 8) & 0x00ff);
-		data[3] = (unsigned char)(  pwm[1+findex*4]       & 0x00ff);
-		data[4] = (unsigned char)( (pwm[2+findex*4] >> 8) & 0x00ff);
-		data[5] = (unsigned char)(  pwm[2+findex*4]       & 0x00ff);
-		data[6] = (unsigned char)( (pwm[3+findex*4] >> 8) & 0x00ff);
-		data[7] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
+	if (hand_version == 1.0 )
+	{
+		// for Allegro Hand v1.0
+		for(int findex=0; findex<4; findex++ )
+		{
+			data[0] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
+			data[1] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
+			data[2] = (unsigned char)( (pwm[1+findex*4] >> 8) & 0x00ff);
+			data[3] = (unsigned char)(  pwm[1+findex*4]       & 0x00ff);
+			data[4] = (unsigned char)( (pwm[2+findex*4] >> 8) & 0x00ff);
+			data[5] = (unsigned char)(  pwm[2+findex*4]       & 0x00ff);
+			data[6] = (unsigned char)( (pwm[3+findex*4] >> 8) & 0x00ff);
+			data[7] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
 
-		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
-		//usleep(10); //KCX
+			_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
+			//usleep(10); //KCX
+		}
+
 	}
+	else if (hand_version >= 2.0 )
+	{
+		// for Allegro Hand v2.0
+		for(int findex=0; findex<4; findex++ )
+		{
+			data[0] = (unsigned char)( (pwm[3+findex*4] >> 8) & 0x00ff);
+			data[1] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
+			data[2] = (unsigned char)( (pwm[2+findex*4] >> 8) & 0x00ff);
+			data[3] = (unsigned char)(  pwm[2+findex*4]       & 0x00ff);
+			data[4] = (unsigned char)( (pwm[1+findex*4] >> 8) & 0x00ff);
+			data[5] = (unsigned char)(  pwm[1+findex*4]       & 0x00ff);
+			data[6] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
+			data[7] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
 
-}
-else if (hand_version >= 2.0 )
-{
-	// for Allegro Hand v2.0
-	for(int findex=0; findex<4; findex++ ){
-		data[0] = (unsigned char)( (pwm[3+findex*4] >> 8) & 0x00ff);
-		data[1] = (unsigned char)(  pwm[3+findex*4]       & 0x00ff);
-		data[2] = (unsigned char)( (pwm[2+findex*4] >> 8) & 0x00ff);
-		data[3] = (unsigned char)(  pwm[2+findex*4]       & 0x00ff);
-		data[4] = (unsigned char)( (pwm[1+findex*4] >> 8) & 0x00ff);
-		data[5] = (unsigned char)(  pwm[1+findex*4]       & 0x00ff);
-		data[6] = (unsigned char)( (pwm[0+findex*4] >> 8) & 0x00ff);
-		data[7] = (unsigned char)(  pwm[0+findex*4]       & 0x00ff);
-
-		_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
-		//usleep(10); //KCX
-	}
-}	
-else
-{
+			_writeDeviceMsg( (DWORD)(ID_CMD_SET_TORQUE_1 + findex), ID_DEVICE_MAIN, ID_COMMON, 8, data);
+			//usleep(10); //KCX
+		}
+	}	
+	else
+	{
 		ROS_ERROR("CAN: Can not determine proper finger CAN channels. Check the Allegro Hand version number in 'zero.yaml'");
-}	
+	}	
 
 	// send message to call joint position and torque query
 	// _writeDeviceMsg(ID_CMD_QUERY_STATE_DATA, ID_DEVICE_MAIN, ID_COMMON);
@@ -540,8 +533,6 @@ void controlAllegroHand::_writeDeviceMsg(DWORD command, DWORD from,DWORD to)
 {
 	_writeDeviceMsg(command, from, to, 0, NULL);
 }
-
-
 
 char controlAllegroHand::_parseCANMsg(TPCANMsg read_msg,  double *values)
 {
@@ -598,10 +589,10 @@ char controlAllegroHand::_parseCANMsg(TPCANMsg read_msg,  double *values)
 		//printf("unknown command %d, src %d, to %d, len %d \n", cmd, src, to, len);
 		ROS_WARN("unknown command %d, src %d, to %d, len %d", cmd, src, to, len);
 		/*
-		for(int nd=0; nd<len; nd++)
-		{
-			printf("%d \n ", tmpdata[nd]);
-		}
+		  for(int nd=0; nd<len; nd++)
+		  {
+		  printf("%d \n ", tmpdata[nd]);
+		  }
 		*/
 		return -1;
 		break;

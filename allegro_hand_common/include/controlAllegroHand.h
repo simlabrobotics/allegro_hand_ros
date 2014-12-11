@@ -6,6 +6,8 @@
  *  Authors: 			Seungsu Kim & Ashwini Schukla
  */
 
+// 20141210: kcchang: added polling style readDevice() and Update()
+
 #ifndef CONTROLALLEGROHAND_H_
 #define CONTROLALLEGROHAND_H_
 
@@ -47,6 +49,7 @@ public:
 	int readDevices();
 	int writeDevices();
 	bool emergencyStop() { return mEmergencyStop; }
+	double torqueConversion() { return tau_cov_const; }
 
 private:
 	HANDLE CanHandle;
@@ -81,8 +84,6 @@ private:
 	//void _writeDeviceMsg(unsigned long command, unsigned long from, unsigned long to);
 	char _parseCANMsg(TPCANMsg read_msg,  double *values);
 	//char _parseCANMsg(TPCANMsg &read_msg,  double *values);
-
 };
-
 
 #endif /* CONTROLALLEGROHAND_H_ */
