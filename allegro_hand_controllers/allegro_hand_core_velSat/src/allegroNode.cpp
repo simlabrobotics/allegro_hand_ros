@@ -164,9 +164,11 @@ controlAllegroHand *canDevice;
 // Called when a desired joint position message is received
 void SetjointCallback(const sensor_msgs::JointState& msg)
 {
+  //  	printf("frame = %ld: setting desired pos\n", frame);
 	mutex->lock();
 	for(int i=0;i<DOF_JOINTS;i++) desired_position[i] = msg.position[i];
 	mutex->unlock();	
+	controlPD = true;
 }
 
 void libCmdCallback(const std_msgs::String::ConstPtr& msg)

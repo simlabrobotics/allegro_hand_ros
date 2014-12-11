@@ -25,8 +25,7 @@
 	<arg name="GROOVY" default="false"/>
 
   	<!-- Allegro Hand controller and communication node -->  
-    	<node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true" args="$(arg polling)">
-    
+    	<node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true" args="$(arg polling)">    
 		<!-- Remapping of topics into enumerated allegroHand_# namespace -->
 		<remap from="/allegroHand/joint_states" to="/allegroHand_$(arg NUM)/joint_states"/>
         	<remap from="/allegroHand/joint_cmd" to="/allegroHand_$(arg NUM)/joint_cmd"/>    	
@@ -46,13 +45,14 @@
 	<node name="jointState2tf_$(arg NUM)" pkg="robot_state_publisher" type="state_publisher">
 		<remap from="/tf" to="/allegroHand_$(arg NUM)/tf"/>
     		<remap from="/joint_states" to="/allegroHand_$(arg NUM)/joint_states"/>		
-    		</node>
+    	</node>
     
 	<!-- Rviz Robot model visualization -->
     	<!-- for Fuerte -->
     	<node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.vcg" unless="$(arg GROOVY)">
 		<remap from="/tf" to="/allegroHand_$(arg NUM)/tf"/>   			
 	</node>	 
+
     	<!-- for Groovy -->  
     	<node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg GROOVY)">
 		<remap from="/tf" to="/allegroHand_$(arg NUM)/tf"/>   	 	

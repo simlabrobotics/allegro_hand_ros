@@ -83,14 +83,15 @@ controlAllegroHand* canDevice;
 // Called when a desired joint position message is received
 void SetjointCallback(const sensor_msgs::JointState& msg)
 {
-	printf("frame = %ld: setting desired pos\n", frame);
+  //	printf("frame = %ld: setting desired pos\n", frame);
 	
 	// TODO check joint limits
 	
 	mutex->lock();
 	for (int i=0; i<DOF_JOINTS; i++) desired_position[i] = msg.position[i];
 	mutex->unlock();
-	
+
+	pBHand->SetJointDesiredPosition(desired_position);	
 	pBHand->SetMotionType(eMotionType_JOINT_PD);	
 }
 
@@ -119,7 +120,7 @@ void libCmdCallback(const std_msgs::String::ConstPtr& msg)
 
 	if (lib_cmd.compare("pdControl") == 0)
 	{
-        // Desired position only necessary if in PD Control mode
+	  // Desired position only necessary if in PD Control mode
 		pBHand->SetJointDesiredPosition(desired_position);	
 		pBHand->SetMotionType(eMotionType_JOINT_PD);
 	}
