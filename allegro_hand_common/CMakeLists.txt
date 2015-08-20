@@ -7,6 +7,7 @@ project(allegro_hand_common)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  libpcan
 )
 
 ## System dependencies are found with CMake's conventions
@@ -81,7 +82,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES allegro_hand_common
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs libpcan
 #  DEPENDS system_lib
 )
 

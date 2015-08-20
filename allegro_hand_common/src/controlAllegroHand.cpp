@@ -8,7 +8,7 @@
 
 // 20141210: kcchang: added polling style readDevice() and Update()
 
-#include "controlAllegroHand.h"
+#include "allegro_hand_common/controlAllegroHand.h"
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
