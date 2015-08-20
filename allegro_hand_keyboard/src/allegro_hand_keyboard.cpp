@@ -288,6 +288,3 @@ void AHKeyboard::keyLoop()
 
   return;
 }
-
-
-
