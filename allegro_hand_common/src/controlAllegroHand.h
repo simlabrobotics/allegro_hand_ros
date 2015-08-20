@@ -8,14 +8,13 @@
 
 // 20141210: kcchang: added polling style readDevice() and Update()
 
-#ifndef CONTROLALLEGROHAND_H_
-#define CONTROLALLEGROHAND_H_
+#ifndef __CONTROLALLEGROHAND_H__
+#define __CONTROLALLEGROHAND_H__
 
-#include <list>
-#include "BHand/BHand.h"
-#include "allegroCANProtocol.h"
+#include "allegro_hand_common/allegroCANProtocol.h"
 #include <libpcan.h>
 #include <fcntl.h>
+#include <list>
 #include <string>
 
 #define ALLEGRO_CONTROL_TIME_INTERVAL 0.003
@@ -86,4 +85,4 @@ private:
 	//char _parseCANMsg(TPCANMsg &read_msg,  double *values);
 };
 
-#endif /* CONTROLALLEGROHAND_H_ */
+#endif /* __CONTROLALLEGROHAND_H__ */
