@@ -134,33 +134,17 @@ find_library(BHAND_LIB
     PATHS lib
 )
 
-message("ASDF")
-
-message("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-message("${CMAKE_OUTPUT_DIRECTORY}")
-message("${CATKIN_PACKAGE_INCLUDE_DESTINATION}")
-message("${BHAND_LIB}")
-message("${CMAKE_SOURCE_DIR}")
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-
-#add_custom_target(BHand ALL
-#   COMMAND cp ${BHAND_LIB} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ )
-
+# Make a tricky BHand target that just copies the .so binary file into the
+# output directory.
 add_library(BHand EXCLUDE_FROM_ALL ${BHAND_LIB})
 add_custom_command(TARGET BHand
 POST_BUILD COMMAND cp ${BHAND_LIB} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ )
 set_target_properties(BHand PROPERTIES LINKER_LANGUAGE CXX)
 
-#add_custom_target(BHand_includes_dummy ALL
-#      COMMAND cp -r ${CMAKE_SOURCE_DIR}/include/BHand ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/ )
-
-#file(COPY ${CMAKE_SOURCE_DIR}/include/BHand/ DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/)
-
-install(FILES
-   ${BHAND_LIB}
-   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+#install(FILES
+#   ${BHAND_LIB}
+#   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#)
 #
 #############
 ## Testing ##
