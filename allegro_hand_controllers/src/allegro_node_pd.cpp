@@ -1,15 +1,15 @@
 /*
  * allegroNode.cpp
  *
- *  Created on: Nov 14, 2012
+ *  Created on: Feb 1, 2013
  *  Authors: Alex ALSPACH, Seungsu KIM
  */
-
+ 
 // 20141210: kcchang: changed Duration to accomodate the hand's own CAN rate
 // 20141211: kcchang: merged callback and polling
 
-// GRASP LIBRARY INTERFACE
-// Using  timer callback  
+// JOINT SPACE POSITION CONTROL
+// Using  timer callback 
  
 #include <iostream>
 #include <boost/thread/thread.hpp>
@@ -23,20 +23,23 @@
 #include "std_msgs/String.h"
 
 #include <stdio.h>
+#include <math.h>
 #include <iostream>
 #include <string>
 
-#include "BHand/BHand.h"
-#include "controlAllegroHand.h"
+#include "allegro_hand_common/controlAllegroHand.h"
 
 // Topics
 #define JOINT_STATE_TOPIC "/allegroHand/joint_states"
 #define JOINT_CMD_TOPIC "/allegroHand/joint_cmd"
 #define LIB_CMD_TOPIC "/allegroHand/lib_cmd"
 
-double desired_position[DOF_JOINTS] 			= {0.0};
+#define RADIANS_TO_DEGREES(radians) ((radians) * (180.0 / M_PI))
+#define DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
+
 double current_position[DOF_JOINTS] 			= {0.0};
-double previous_position[DOF_JOINTS] 			= {0.0};
+double previous_position[DOF_JOINTS]			= {0.0};
+
 double current_position_filtered[DOF_JOINTS] 	= {0.0};
 double previous_position_filtered[DOF_JOINTS]	= {0.0};
 
@@ -44,155 +47,188 @@ double current_velocity[DOF_JOINTS] 			= {0.0};
 double previous_velocity[DOF_JOINTS] 			= {0.0};
 double current_velocity_filtered[DOF_JOINTS] 	= {0.0};
 
+double desired_position[DOF_JOINTS]				= {0.0};
 double desired_torque[DOF_JOINTS] 				= {0.0};
 
-std::string  lib_cmd;
+double k_p[DOF_JOINTS] =
+{
+	600.0,  600.0,  600.0, 1000.0,  // Default P Gains for PD Controller
+	600.0,  600.0,  600.0, 1000.0,	// These gains are loaded if the 'gains_pd.yaml' file is not loaded
+	600.0,  600.0,  600.0, 1000.0,
+	1000.0, 1000.0, 1000.0,  600.0
+};
+
+double k_d[DOF_JOINTS] =
+{
+	15.0,   20.0,   15.0,   15.0,  // Default D Gains for PD Controller
+	15.0,   20.0,   15.0,   15.0,	// These gains are loaded if the 'gains_pd.yaml' file is not loaded
+	15.0,   20.0,   15.0,   15.0,
+	30.0,   20.0,   20.0,   15.0
+};
+											
+double home_pose[DOF_JOINTS] =
+{
+	0.0,  -10.0,   45.0,   45.0,  // Default (HOME) position (degrees)
+	0.0,  -10.0,   45.0,   45.0,	// This position is loaded and set upon system start
+	5.0,   -5.0,   50.0,   45.0,	// if no 'initial_position.yaml' parameter is loaded.
+	60.0,   25.0,   15.0,   45.0
+};
+
+std::string pGainParams[DOF_JOINTS] =
+{
+	"~gains_pd/p/j00", "~gains_pd/p/j01", "~gains_pd/p/j02", "~gains_pd/p/j03", 
+	"~gains_pd/p/j10", "~gains_pd/p/j11", "~gains_pd/p/j12", "~gains_pd/p/j13",
+	"~gains_pd/p/j20", "~gains_pd/p/j21", "~gains_pd/p/j22", "~gains_pd/p/j23", 
+	"~gains_pd/p/j30", "~gains_pd/p/j31", "~gains_pd/p/j32", "~gains_pd/p/j33"
+};
+
+std::string dGainParams[DOF_JOINTS] =
+{
+	"~gains_pd/d/j00", "~gains_pd/d/j01", "~gains_pd/d/j02", "~gains_pd/d/j03", 
+	"~gains_pd/d/j10", "~gains_pd/d/j11", "~gains_pd/d/j12", "~gains_pd/d/j13",
+	"~gains_pd/d/j20", "~gains_pd/d/j21", "~gains_pd/d/j22", "~gains_pd/d/j23", 
+	"~gains_pd/d/j30", "~gains_pd/d/j31", "~gains_pd/d/j32", "~gains_pd/d/j33"
+};
+										
+std::string initialPosition[DOF_JOINTS] =
+{
+	"~initial_position/j00", "~initial_position/j01", "~initial_position/j02", "~initial_position/j03", 
+	"~initial_position/j10", "~initial_position/j11", "~initial_position/j12", "~initial_position/j13",
+	"~initial_position/j20", "~initial_position/j21", "~initial_position/j22", "~initial_position/j23", 
+	"~initial_position/j30", "~initial_position/j31", "~initial_position/j32", "~initial_position/j33"
+};										
 
 std::string jointNames[DOF_JOINTS] 	=
 {
-	"joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
+    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
 	"joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
 	"joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
 	"joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0"
 };
-										  
+
 long frame = 0;
 
 // Flags
 int lEmergencyStop = 0;
+bool controlPD = false;
 
 boost::mutex *mutex;
 
 // ROS Messages
 ros::Publisher joint_state_pub;
-ros::Subscriber joint_cmd_sub;
-ros::Subscriber lib_cmd_sub;
+ros::Subscriber joint_cmd_sub;		// handles external joint command (eg. sensor_msgs/JointState)
+ros::Subscriber lib_cmd_sub;	// handles any other type of eternal command (eg. std_msgs/String)
 sensor_msgs::JointState msgJoint;
+std::string  lib_cmd;
 
 // ROS Time
 ros::Time tstart;
 ros::Time tnow;
 double dt;
 
-// Initialize BHand 
-BHand* pBHand = NULL;
-
 // Initialize CAN device		
-controlAllegroHand* canDevice;
+controlAllegroHand *canDevice;
 
 // Called when a desired joint position message is received
 void SetjointCallback(const sensor_msgs::JointState& msg)
 {
-  //	printf("frame = %ld: setting desired pos\n", frame);
-	
-	// TODO check joint limits
-	
+  //  	printf("frame = %ld: setting desired pos\n", frame);
 	mutex->lock();
-	for (int i=0; i<DOF_JOINTS; i++) desired_position[i] = msg.position[i];
-	mutex->unlock();
-
-	pBHand->SetJointDesiredPosition(desired_position);	
-	pBHand->SetMotionType(eMotionType_JOINT_PD);	
+	for(int i=0;i<DOF_JOINTS;i++) desired_position[i] = msg.position[i];
+	mutex->unlock();	
+	controlPD = true;
 }
 
-// BHAND Communication
-// desired joint positions are obtained from subscriber "joint_cmd_sub"
-// or maintatined as the initial positions from program start (PD control)
-// Also, other motions/grasps can be executed (envoked via "lib_cmd_sub")		  
-
-/*
-  eMotionType_NONE,				// motor power off
-  eMotionType_HOME,				// go to home position
-  eMotionType_READY,			// ready position for grasping
-  eMotionType_GRASP_3,			// grasping using 3 fingers
-  eMotionType_GRASP_4,			// grasping using 4 fingers
-  eMotionType_PINCH_IT,			// pinching using index finger and thumb
-  eMotionType_PINCH_MT,			// pinching using middle finger and thumb
-  eMotionType_ENVELOP,			// enveloping
-  eMotionType_JOINT_PD,			// joint pd control
-  eMotionType_OBJECT_MOVING,	//
-  eMotionType_PRE_SHAPE,		//
-*/
+// Called when an external (string) message is received
 void libCmdCallback(const std_msgs::String::ConstPtr& msg)
 {
 	ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
+
 	lib_cmd = msg->data.c_str();
 
+	// Compare the message received to an expected input
 	if (lib_cmd.compare("pdControl") == 0)
-	{
-	  // Desired position only necessary if in PD Control mode
-		pBHand->SetJointDesiredPosition(desired_position);	
-		pBHand->SetMotionType(eMotionType_JOINT_PD);
-	}
+		controlPD = true;
+
 	else if (lib_cmd.compare("home") == 0)
-		pBHand->SetMotionType(eMotionType_HOME);
-    
-	else if (lib_cmd.compare("ready") == 0) 
-		pBHand->SetMotionType(eMotionType_READY);
-	
-	else if (lib_cmd.compare("grasp_3") == 0) 
-		pBHand->SetMotionType(eMotionType_GRASP_3);
-	
-	else if (lib_cmd.compare("grasp_4") == 0) 
-		pBHand->SetMotionType(eMotionType_GRASP_4);
-    
-	else if (lib_cmd.compare("pinch_it") == 0) 
-		pBHand->SetMotionType(eMotionType_PINCH_IT);
-	
-	else if (lib_cmd.compare("pinch_mt") == 0) 
-		pBHand->SetMotionType(eMotionType_PINCH_MT); 	 
-	
-	else if (lib_cmd.compare("envelop") == 0) 
-		pBHand->SetMotionType(eMotionType_ENVELOP); 
-	
-	else if (lib_cmd.compare("off") == 0) 
-		pBHand->SetMotionType(eMotionType_NONE);
+	{
+		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);
+		controlPD = true;
+	}
+	else if (lib_cmd.compare("off") == 0)
+		controlPD = false;
 	
 	else if (lib_cmd.compare("save") == 0) 
-		for (int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];
+		for (int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];	
 }
 
 void computeDesiredTorque()
 {
-	// compute control torque using Bhand library
-	pBHand->SetJointPosition(current_position_filtered);
-			
-	// BHand lib control updated with time stamp
-	pBHand->UpdateControl((double)frame*ALLEGRO_CONTROL_TIME_INTERVAL);
-			
-	// Necessary torque obtained from Bhand lib
-	pBHand->GetJointTorque(desired_torque);			
+    /*  ================================= 
+		=        POSITION CONTROL       =   
+		================================= */
+	if (controlPD)
+	{
+		for(int i=0; i<DOF_JOINTS; i++)    
+		{
+			desired_torque[i] = k_p[i]*(desired_position[i]-current_position_filtered[i]) - k_d[i]*current_velocity_filtered[i];
+			desired_torque[i] = desired_torque[i]/canDevice->torqueConversion();
+		}
+	}
+	else
+	{
+		for(int i=0; i<DOF_JOINTS; i++) desired_torque[i] = 0.0;
+	}
 }
 
 void initController(const std::string& whichHand)
 {
-	// Initialize BHand controller
-	if (whichHand.compare("left") == 0)
+	// set gains_pd via gains_pd.yaml or to defaul values
+	if (ros::param::has("~gains_pd"))
 	{
-		pBHand = new BHand(eHandType_Left);
-		ROS_WARN("CTRL: Left Allegro Hand controller initialized.");
+		ROS_INFO("\n\nCTRL: PD gains loaded from param server.\n");
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			ros::param::get(pGainParams[i], k_p[i]);
+			ros::param::get(dGainParams[i], k_d[i]);
+			//printf("%f ", k_p[i]);
+		}
+		//printf("\n");
 	}
 	else
 	{
-		pBHand = new BHand(eHandType_Right);
-		ROS_WARN("CTRL: Right Allegro Hand controller initialized.");
+		// gains will be loaded every control iteration
+		ROS_WARN("\n\nCTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains_pd.yaml\nloading default PD gains...\n");
 	}
-	pBHand->SetTimeInterval(ALLEGRO_CONTROL_TIME_INTERVAL);
-	pBHand->SetMotionType(eMotionType_NONE);
-	
-	// sets initial desired pos at start pos for PD control
-	for (int i=0; i<DOF_JOINTS; i++) desired_position[i] = current_position[i];
+
+	// set initial position via initial_position.yaml or to defaul values
+	if (ros::param::has("~initial_position"))
+	{
+		ROS_INFO("\n\nCTRL: Initial Pose loaded from param server.\n");
+		for(int i=0; i<DOF_JOINTS; i++)
+		{
+			ros::param::get(initialPosition[i], desired_position[i]);
+			//ROS_INFO("%s, %f\n",initialPosition[i].c_str(), desired_position[i]);
+			desired_position[i] = DEGREES_TO_RADIANS(desired_position[i]);
+		}
+	}
+	else
+	{
+		ROS_WARN("\n\nCTRL: Initial postion not loaded.\nCheck launch file is loading /parameters/initial_position.yaml\nloading Home position instead...\n");
+		// Home position
+		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);										
+	}
+	controlPD = false;
 
 	printf("*************************************\n");
-	printf("         Grasp (BHand) Method        \n");
+	printf("      Joint PD Control Method        \n");
 	printf("-------------------------------------\n");
-    printf("         Every command works.        \n");
-	printf("*************************************\n");		
+    printf("  Only 'H', 'O', 'S', 'Space' works. \n");
+	printf("*************************************\n");	
 }
 
 void cleanController()
 {
-	delete pBHand;
 }
 
 void publishData()
@@ -255,9 +291,9 @@ void updateController()
 	}
 	
 	computeDesiredTorque();	
-			
+
 	publishData();
-	
+
 	frame++;
 } 
 
@@ -354,5 +390,3 @@ int main(int argc, char** argv)
 	printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
 	return 0;
 }
-
-

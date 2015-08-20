@@ -33,7 +33,7 @@
 #include <iostream>
 #include <string>
 
-#include "controlAllegroHand.h"
+#include "allegro_hand_common/controlAllegroHand.h"
 
 // Topics
 #define JOINT_STATE_TOPIC "/allegroHand/joint_states"
