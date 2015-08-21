@@ -8,6 +8,7 @@
           RESPAWN:=true|false   Respawn controller if it dies.
           KEYBOARD:=true|false  (default is true)
           CAN_DEVICE:=/dev/pcanusb1 | /dev/pcanusbNNN  (ls -l /dev/pcan* to see open CAN devices)
+          VISUALIZE:=true|false  (Launch rviz)
 
        This script launches the following nodes:
          - allegro hand controller (different controllers exist)
@@ -16,6 +17,11 @@
 
   -->
 
+  <!-- Visualization with rviz, only if arg VISUALIZE is set to true. Default is
+       false, the allegro_viz.launch can be started separated. -->
+  <arg name ="VISUALIZE" default="false" />
+  <include file="$(find allegro_hand_controllers)/launch/allegro_viz.launch"
+           if="$(arg VISUALIZE)"/>
 
   <arg name="CONTROLLER" default="grasp"/> <!-- grasp, pd, velsat  -->
   <!-- Controllers include:
