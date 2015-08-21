@@ -208,8 +208,6 @@ void AHKeyboard::keyLoop()
 
     //linear_=angular_=0;
     ROS_DEBUG("value: 0x%02X\n", c);
-    printf("value: 0x%02X\n", c);
-
     switch(c)
     {
       case VK_SPACE:
