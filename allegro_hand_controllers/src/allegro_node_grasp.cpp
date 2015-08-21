@@ -221,8 +221,7 @@ void updateWriteReadCAN()
   if (lEmergencyStop < 0)
   {
     // Stop program when Allegro Hand is switched off
-    //printf("\n\n\nEMERGENCY STOP.\n\n");
-    ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
+    ROS_ERROR("Allegro Hand Node is Shutting Down! (Emergency Stop)");
     ros::shutdown();
   }
 }
@@ -324,11 +323,10 @@ int main(int argc, char** argv)
   tstart = ros::Time::now();
 
   // Starts control loop, message pub/subs and all other callbacks
-  printf("\n\nStart controller with polling:=");
+  ROS_INFO("Start controller with polling = %s", argv[1]);
 
   if (argv[1] == std::string("true")) //polling:=true
   {
-    printf("true\n");
     while (ros::ok())
     {
       updateController();
@@ -337,7 +335,6 @@ int main(int argc, char** argv)
   }
   else
   {
-    printf("false\n");
     // Setup timer callback
     ros::Timer timer = nh.createTimer(ros::Duration(0.001), timerCallback); //KCX
     ros::spin();
@@ -351,7 +348,6 @@ int main(int argc, char** argv)
   nh.shutdown();
   cleanController();
   delete canDevice;
-  //printf("\nBye.\n");
-  printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
+  ROS_INFO("Allegro Hand Node has been shut down.");
   return 0;
 }
