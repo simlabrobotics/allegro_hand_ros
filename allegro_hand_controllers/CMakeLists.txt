@@ -82,7 +82,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
+#  INCLUDE_DIRS include
 #  LIBRARIES allegro_hand_controllers
   CATKIN_DEPENDS allegro_hand_common bhand libpcan roscpp sensor_msgs
   DEPENDS system_lib
