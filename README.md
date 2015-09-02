@@ -1,16 +1,66 @@
-allegro_hand_ros beta2
-======================
+allegro_hand_ros beta2, unofficial fork
+=======================================
 
-This ROS Stack includes code and tools useful to users of SimLab Co., Ltd.'s Allegro Hand.<br>
+This is an unofficial fork of SimLab's allegro [hand ros package][1].
 
+It provides the same code in a catkin-ized version, merges all of the launch
+files into two, updates some of the package/node names to have a more consistent
+structure, and improves the build process by creating a common library.
+
+It also provides the BHand library directly in this package (including both
+32-bit and 64-bit versions, though 32-bit systems will need to update the
+symlink manually).
+
+Non-compatible changes between the two version are:
+
+ - Put all of the controllers into one *package* (allegro_hand_controllers) and
+   made each controller a different node (allegro_node_XXXX): grasp, pd, velsat.
+ - Single launch file with arguments instead of multiple launch files with
+   repeated code.
+ - Both the parameter and description files are now ROS packages, so that
+   `rospack find` works with them.
+ - These packages will likely not work with pre-hydro versions (only tested on
+   indigo so far, please let me know if this works on other distributions).
+
+There are probably many more.
+
+Launch file instructions:
+------------------------
+
+    roslaunch allegro_hand_controllers allegro_hand.launch HAND:=right
+
+Optional (recommended) arguments:
+
+          ZEROS:=/path/to/zeros_file.yaml
+          CONTROLLER:=grasp|pd|velsat
+          RESPAWN:=true|false   Respawn controller if it dies.
+          KEYBOARD:=true|false  (default is true)
+          CAN_DEVICE:=/dev/pcanusb1 | /dev/pcanusbNNN  (ls -l /dev/pcan* to see open CAN devices)
+          VISUALIZE:=true|false  (Launch rviz)
+
+The second launch file is for visualization, it is included in
+`allegro_hand.launch` if `VISUALIZE:=true`. Otherwise, it can be useful to run
+it separately (with `VISUALIZE:=false`) if you want to start rviz separately
+(and keep it running):
+
+    roslaunch allegro_hand_controllers allegro_viz.launch HAND:=right
+
+[1]: https://github.com/simlabrobotics/allegro_hand_ros
+
+Below is the original Simlab README (some sections that are no longer useful removed).
+
+
+----------
+
+
+This ROS Stack includes code and tools useful to users of SimLab Co., Ltd.'s
+Allegro Hand.
 
 **Note:** This stack works with Allegro Hands v3.0 and up by befault.
 See the end of this document for how to use this package with an older Allegro Hand.
 
-
-For more information visit SimLab's [Allegro Hand wiki](http://www.simlab.co.kr/AllegroHand/wiki).<br>
+For more information visit SimLab's [Allegro Hand wiki](http://www.simlab.co.kr/AllegroHand/wiki).
 ROS specific information can be found on the [ROS wiki](http://www.ros.org/wiki/allegro_hand_ros).
-
 
 **Announcement:** The next major release of this stack will include the integration of certain sensor systems
 
@@ -65,16 +115,12 @@ Launchers
     * 0 (default)
     * Any Integer (1, 2, 3, ... )
 
-  * **GROOVY:=** (Specify ROS distro)
-    * false (default, used for ROS Fuerte)
-    * true
-
-**Note:** Also, the following arguments can be specified for actual hardware launch file:
+Also, the following arguments can be specified for actual hardware launch file:
 
   * **CONTROLLER:=** (Specify the controller / Grasp library or simple joint space controller)
     * grasp (default)
     * pd
-    * velSat
+    * velsat
 
   * **pollling:=** (Specify if CAN communication is done by polling)
     * true (default)
@@ -90,31 +136,6 @@ Launchers
 
 
 
-<br>
-**Examples:**<br>
-* To launch the default grasp controller w/o polling for the right Allegro Hand using Fuerte you can use either of the following two commands:
-
-```
-roslaunch allegro_hand.launch CONTROLLER:=grasp HAND:=right GROOVY:=false polling:=false
-```
-```
-roslaunch allegro_hand.launch
-```
-
-<br>
-* For the PD controller w/ polling on a right hand using Groovy:
-
-```
-roslaunch allegro_hand.launch HAND:=right CONTROLLER:=pd GROOVY:=true polling:=true
-```
-
-<br>
-* Using velocity saturation controller on a left, CAN Channel 1 and the offsets, etc. for Hand SAH020CR020:
-
-```
-roslaunch allegro_hand.launch CONTROLLER:=velSat HAND:=left CAN_CH:=1 ZEROS:=parameters/zero_files/zero_SAH020CR020.yaml
-```
-
 Controlling More Than One Hand
 ------------------------------
 
@@ -124,31 +145,3 @@ Controlling More Than One Hand
   roslaunch allegro_hand.launch HAND:=right ZEROS:=parameters/zero0.yaml NUM:=0 CAN_CH:=/dev/pcan0
   roslaunch allegro_hand.launch HAND:=left  ZEROS:=parameters/zero1.yaml NUM:=1 CAN_CH:=/dev/pcan1
 ```
-
-Thanks
-------
-Please be advised, this is the first beta release of the ROS stack for SimLab's Allegro Hand platform. There will likely be bugs and there is much room for improvement.
-
-Please share you improvements to the code included in this release. Also, we would love to include the interesting controllers you may create as part of the package. Please keep an open line of contact as we continue to develop this software.
-
-Thanks.
-
-K.C. Chang <kcchang@simlab.co.kr>
-
-
-
-<br>
-
-**Note:** As stated above, control loops utilizing both timer callbacks and ROS' Rate object are included. Generally, the timer callback is more reliable as it will run the control code in a new thread if the previous iteration fails to end within the given crol period. The rate object, aling with a spinOnce() and a sleep, generally does a fine job but some anomolies have been recognized where the loop toaks much too long and remains blocked until finishing. Using the rate/sleep method allows for simpler code. However, due to Allegro Hand's own real time clock sampling rate (@333Hz) to write 16 encoder values to the CAN bus, interrupt/rate/sleep can cause conflicts in the CAN communication resulting unstable motions. Finally, we mention our preferred solution one more time. The solution is to have the main control loop polling the CAN-readDevice(). readDevice() will return when 16 encoder values are availbe and read in the CAN bus. Since Allegro Hand automatically writes 16 encoder values in every 1/333 sec, this polling method provides the stable sampling rate of 333 Hz!!!
-
-Loop:
-* writeTorque()
-* readEncoder()
-* userInterface()
-* computeTorque()
-
-For Allegro Hand v3.0
----------------------
-
-TODO
-Adapt to new versions of Ubuntu and ROS. Too many!!! :)
