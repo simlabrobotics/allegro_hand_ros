@@ -36,14 +36,17 @@
        Which hand (left/right) must now be specified as an argument when launching the Allegro Hand
        as an input for both the robot_description and for the grasping library controllers. -->
 
-  <arg name="HAND"/> 					<!-- left, right -->
-  <arg name="NUM" default='0'/>				<!-- 0, 1, 2, ...  -->
-  <arg name="CAN_DEVICE" default="/dev/pcanusb1"/>		<!-- ls -l /dev/pcan*    to see your open CAN ports -->
-  <arg name="ZEROS" default="parameters/zero.yaml"/>	<!-- yaml param files for your hand can be found in parameters/zero_files/ -->
+  <arg name="HAND"/>
+  <arg name="NUM" default='0'/>
+
+  <!-- ls -l /dev/pcan* to see your open CAN ports -->
+  <arg name="CAN_DEVICE" default="/dev/pcanusb1"/>
 
   <arg name="PARAMS_DIR" default="$(find allegro_hand_parameters)" />
   <arg name="KEYBOARD" default="true" />
 
+  <!-- yaml param files for your hand can be found in parameters/zero_files/ -->
+  <arg name="ZEROS" default="$(arg PARAMS_DIR)/zero.yaml"/>
 
   <param name="/robot_description"
          textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
