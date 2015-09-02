@@ -15,16 +15,9 @@ catkin_package(
   LIBRARIES BHand
 )
 
-#############
-## Install ##
-#############
-
-## Mark header files for installation
-install(DIRECTORY include
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
+###########
+## Build ##
+###########
 
 # NOTE: You can switch to 32 bit if necessary by updating the symbolic link.
 find_library(BHAND_LIB
@@ -38,3 +31,19 @@ add_library(BHand EXCLUDE_FROM_ALL ${BHAND_LIB})
 add_custom_command(TARGET BHand
 POST_BUILD COMMAND cp ${BHAND_LIB} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ )
 set_target_properties(BHand PROPERTIES LINKER_LANGUAGE CXX)
+
+#############
+## Install ##
+#############
+
+## Mark header files for installation
+install(DIRECTORY include/BHand
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+)
+
+install(TARGETS BHand
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
