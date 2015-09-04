@@ -27,7 +27,7 @@ find_library(BHAND_LIB
 
 # Make a tricky BHand target that just copies the .so binary file into the
 # output directory.
-add_library(BHand EXCLUDE_FROM_ALL ${BHAND_LIB})
+add_library(BHand ${BHAND_LIB})
 add_custom_command(TARGET BHand
 POST_BUILD COMMAND cp ${BHAND_LIB} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ )
 set_target_properties(BHand PROPERTIES LINKER_LANGUAGE CXX)
