@@ -21,7 +21,9 @@
        false, the allegro_viz.launch can be started separated. -->
   <arg name ="VISUALIZE" default="false" />
   <include file="$(find allegro_hand_controllers)/launch/allegro_viz.launch"
-           if="$(arg VISUALIZE)"/>
+           if="$(arg VISUALIZE)">
+    <arg name="NUM" value="$(arg NUM)"/>
+  </include>
 
   <arg name="CONTROLLER" default="grasp"/> <!-- grasp, pd, velsat  -->
   <!-- Controllers include:
