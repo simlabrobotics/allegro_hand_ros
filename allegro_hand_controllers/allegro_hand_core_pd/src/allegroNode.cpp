@@ -100,8 +100,8 @@ std::string initialPosition[DOF_JOINTS] =
 
 std::string jointNames[DOF_JOINTS] 	=
 {
-    "joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0" , 
-	"joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0" , 
+	"joint_0.0",    "joint_1.0",    "joint_2.0",   "joint_3.0", 
+	"joint_4.0",    "joint_5.0",    "joint_6.0",   "joint_7.0", 
 	"joint_8.0",    "joint_9.0",    "joint_10.0",  "joint_11.0", 
 	"joint_12.0",   "joint_13.0",   "joint_14.0",  "joint_15.0"
 };
@@ -142,7 +142,7 @@ void SetjointCallback(const sensor_msgs::JointState& msg)
 // Called when an external (string) message is received
 void libCmdCallback(const std_msgs::String::ConstPtr& msg)
 {
-	ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
+	// ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
 
 	lib_cmd = msg->data.c_str();
 
@@ -186,7 +186,7 @@ void initController(const std::string& whichHand)
 	// set gains_pd via gains_pd.yaml or to defaul values
 	if (ros::param::has("~gains_pd"))
 	{
-		ROS_INFO("\n\nCTRL: PD gains loaded from param server.\n");
+	//	ROS_INFO("\n\nCTRL: PD gains loaded from param server.\n");
 		for(int i=0; i<DOF_JOINTS; i++)
 		{
 			ros::param::get(pGainParams[i], k_p[i]);
@@ -198,13 +198,13 @@ void initController(const std::string& whichHand)
 	else
 	{
 		// gains will be loaded every control iteration
-		ROS_WARN("\n\nCTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains_pd.yaml\nloading default PD gains...\n");
+	//	ROS_WARN("\n\nCTRL: PD gains not loaded.\nCheck launch file is loading /parameters/gains_pd.yaml\nloading default PD gains...\n");
 	}
 
 	// set initial position via initial_position.yaml or to defaul values
 	if (ros::param::has("~initial_position"))
 	{
-		ROS_INFO("\n\nCTRL: Initial Pose loaded from param server.\n");
+	//	ROS_INFO("\n\nCTRL: Initial Pose loaded from param server.\n");
 		for(int i=0; i<DOF_JOINTS; i++)
 		{
 			ros::param::get(initialPosition[i], desired_position[i]);
@@ -214,17 +214,17 @@ void initController(const std::string& whichHand)
 	}
 	else
 	{
-		ROS_WARN("\n\nCTRL: Initial postion not loaded.\nCheck launch file is loading /parameters/initial_position.yaml\nloading Home position instead...\n");
+	//	ROS_WARN("\n\nCTRL: Initial postion not loaded.\nCheck launch file is loading /parameters/initial_position.yaml\nloading Home position instead...\n");
 		// Home position
 		for(int i=0; i<DOF_JOINTS; i++)	desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]);										
 	}
 	controlPD = false;
 
-	printf("*************************************\n");
-	printf("      Joint PD Control Method        \n");
-	printf("-------------------------------------\n");
-    printf("  Only 'H', 'O', 'S', 'Space' works. \n");
-	printf("*************************************\n");	
+//	printf("*************************************\n");
+//	printf("      Joint PD Control Method        \n");
+//	printf("-------------------------------------\n");
+//	printf("  Only 'H', 'O', 'S', 'Space' works. \n");
+//	printf("*************************************\n");	
 }
 
 void cleanController()
@@ -257,8 +257,8 @@ void updateWriteReadCAN()
 	{
 		// Stop program when Allegro Hand is switched off
 		//printf("\n\n\nEMERGENCY STOP.\n\n");
-		ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
-		ros::shutdown();
+		//ROS_ERROR("\n\nAllegro Hand Node is Shutting Down! (Emergency Stop)\n");
+		//ros::shutdown();
 	}
 }
 
@@ -284,7 +284,7 @@ void updateController()
 	   ================================== */
 	for (int i=0; i<DOF_JOINTS; i++)    
 	{
-		current_position_filtered[i] = (0.6*current_position_filtered[i]) + (0.198*previous_position[i]) + (0.198*current_position[i]);
+		current_position_filtered[i] = (0.4*current_position_filtered[i]) + (0.3*previous_position[i]) + (0.3*current_position[i]);
 		current_velocity[i] = (current_position_filtered[i] - previous_position_filtered[i]) / dt;
 		current_velocity_filtered[i] = (0.6*current_velocity_filtered[i]) + (0.198*previous_velocity[i]) + (0.198*current_velocity[i]);
 		current_velocity[i] = (current_position[i] - previous_position[i]) / dt;
@@ -340,7 +340,7 @@ int main(int argc, char** argv)
 	ros::param::get("~hand_info/version",version);
 
 	// Dump Allegro Hand information to the terminal	
-	cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
+	// cout << endl << endl << robot_name << " v" << version << endl << serial << " (" << whichHand << ")" << endl << manufacturer << endl << origin << endl << endl;
 		
 	// Initialize CAN device
 	canDevice = new controlAllegroHand();
@@ -359,11 +359,11 @@ int main(int argc, char** argv)
 	tstart = ros::Time::now();
 	
 	// Starts control loop, message pub/subs and all other callbacks
-	printf("\n\nStart controller with polling:=");
+	//printf("\n\nStart controller with polling:=");
 	
 	if (argv[1] == std::string("true")) //polling:=true
 	{
-		printf("true\n");
+	//	printf("true\n");
 		while (ros::ok())
 		{
 			updateController();
@@ -372,7 +372,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		printf("false\n");
+	//	printf("false\n");
 		// Setup timer callback
 		ros::Timer timer = nh.createTimer(ros::Duration(0.001), timerCallback); //KCX
 		ros::spin();		
@@ -387,6 +387,6 @@ int main(int argc, char** argv)
 	cleanController();
 	delete canDevice;
 	//printf("\nBye.\n");
-	printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
+	//printf("\nAllegro Hand Node has been shut down. Bye!\n\n");
 	return 0;
 }
