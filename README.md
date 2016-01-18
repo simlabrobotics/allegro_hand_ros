@@ -64,5 +64,5 @@ Launchers
 
 **Examples:**<br>
 roslaunch allegro_hand.launch<br>
-roslaunch allegro_hand.launch CONT:=grasp HAND:=left VIZ:=false POLL:=false
+roslaunch allegro_hand.launch CONT:=grasp HAND:=left VIZ:=false POLL:=false<br>
 roslaunch allegro_hand_virtual.launch
