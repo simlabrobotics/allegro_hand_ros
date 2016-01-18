@@ -1,7 +1,7 @@
 Allegro Hand Glove Control
 ======================
-This is a fork of the original Allegro Hand ROS repository found here: https://github.com/simlabrobotics/allegro_hand_ros
-This fork's purpose is to trim down as much functionality as possible and leave a bare human-robot interface to the Allegro Hand using a glove with sensors.
+This is a fork of the original Allegro Hand ROS repository found here: https://github.com/simlabrobotics/allegro_hand_ros.<br>
+This fork's purpose is to trim down as much functionality as possible and leave a bare human-robot interface to the Allegro Hand using a glove with sensors. You will, of course, need to make the glove for this to work.
 
 Contents
 --------
