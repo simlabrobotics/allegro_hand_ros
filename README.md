@@ -63,5 +63,6 @@ Launchers
     * another PEAK CAN Channel (see in /dev/*)
 
 **Examples:**<br>
-roslaunch allegro_hand.launch
+roslaunch allegro_hand.launch<br>
 roslaunch allegro_hand.launch CONT:=grasp HAND:=left VIZ:=false POLL:=false
+roslaunch allegro_hand_virtual.launch
