@@ -1,16 +1,17 @@
 <launch>	
-	<arg name="CONTROLLER" default="pd"/>			<!-- grasp, pd, velSat  -->	
-	<arg name="polling" default="true"/>			<!-- true, false for polling the CAN communication -->
+	<arg name="CONT" default="pd"/>				<!-- grasp, pd, velSat  -->	
+	<arg name="POLL" default="true"/>			<!-- true, false for polling the CAN communication -->
 	<arg name="HAND" default="right"/> 			<!-- left, right -->
 	<arg name="NUM" default='0'/>				<!-- 0, 1, 2, ...  -->	
 	<arg name="CAN_CH" default="/dev/pcanusb0"/>		<!-- ls -l /dev/pcan*    to see your open CAN ports -->
 	<arg name="ZEROS" default="parameters/zero.yaml"/>	<!-- yaml param files for your hand can be found in parameters/zero_files/ -->
+	<arg name="VIZ" default="true"/>			<!-- true, false for vizualizing with Rviz -->
 	
 	<param name="/robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 	<param name="/allegroHand_$(arg NUM)/robot_description" textfile="$(find allegro_hand_description)/allegro_hand_description_$(arg HAND).urdf"/>
 
   	<!-- Allegro Hand controller and communication node -->  
-    	<node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONTROLLER)" type="allegro_hand_core_$(arg CONTROLLER)" output="screen" clear_params="true" args="$(arg polling)">    
+    	<node name="allegroHand_$(arg HAND)_$(arg NUM)" pkg="allegro_hand_core_$(arg CONT)" type="allegro_hand_core_$(arg CONT)" output="screen" clear_params="true" args="$(arg POLL)">    
 		<!-- Remapping of topics into enumerated allegroHand_# namespace -->
 		<remap from="/allegroHand/joint_states" to="/allegroHand_$(arg NUM)/joint_states"/>
         	<remap from="/allegroHand/joint_cmd" to="/allegroHand_$(arg NUM)/joint_cmd"/>    	
@@ -33,7 +34,7 @@
     	</node>
     
 	<!-- Rviz visualization -->
-    	<node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz">
+    	<node name="rviz_$(arg NUM)" pkg="rviz" type="rviz" args="-d $(find allegro_hand_description)/allegro_hand_config.rviz" if="$(arg VIZ)">
 		<remap from="/tf" to="/allegroHand_$(arg NUM)/tf"/>   	 	
 	</node>	
 
