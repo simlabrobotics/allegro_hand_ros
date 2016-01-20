@@ -6,6 +6,8 @@
  *  Authors: 			Seungsu Kim & Ashwini Schukla
  */
 
+// 20141210: kcchang: added polling style readDevice() and Update()
+
 #ifndef CONTROLALLEGROHAND_H_
 #define CONTROLALLEGROHAND_H_
 
@@ -36,11 +38,18 @@ public:
 
 	void init(int mode = 0);
 	int update(void);
+	int Update(void); //KCX
 	int  command(const short& cmd, const int& arg = 0);
 
 	void setTorque(double *torque);
 //	void getJointInfo(double *position, double *torque);
 	void getJointInfo(double *position);
+
+	//KCX
+	int readDevices();
+	int writeDevices();
+	bool emergencyStop() { return mEmergencyStop; }
+	double torqueConversion() { return tau_cov_const; }
 
 private:
 	HANDLE CanHandle;
@@ -53,6 +62,7 @@ private:
 	double desired_torque[DOF_JOINTS];
 	
 	double hand_version;
+	double tau_cov_const;
 
 	double mPWM_MAX[DOF_JOINTS];
 	int    mEncoderOffset[DOF_JOINTS];
@@ -74,8 +84,6 @@ private:
 	//void _writeDeviceMsg(unsigned long command, unsigned long from, unsigned long to);
 	char _parseCANMsg(TPCANMsg read_msg,  double *values);
 	//char _parseCANMsg(TPCANMsg &read_msg,  double *values);
-
 };
-
 
 #endif /* CONTROLALLEGROHAND_H_ */
